@@ -38,6 +38,13 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 
+#@app.route("/hello/<string:name>/")
+#@login_required
+#def hello(name):
+#    return render_template(
+#    'test.html',name=name)</string:name>
+
+
 @app.route("/")
 @login_required
 def index():

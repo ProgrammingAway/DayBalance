@@ -1,0 +1,133 @@
+nav .navbar-brand
+{
+    /* size for brand */
+    font-size: xx-large;
+}
+
+/* colors for brand */
+nav .navbar-brand .blue
+{
+    color: #537fbe;
+}
+nav .navbar-brand .red
+{
+    color: #ea433b;
+}
+nav .navbar-brand .yellow
+{
+    color: #f5b82e;
+}
+nav .navbar-brand .green
+{
+    color: #2e944b;
+}
+
+main .form-control
+{
+    /* center form controls */
+    display: inline-block;
+
+    /* override Bootstrap's 100% width for form controls */
+    width: auto;
+}
+
+main
+{
+    /* scroll horizontally as needed */
+    overflow-x: auto;
+
+    /* center contents */
+    text-align: center;
+}
+
+main img
+{
+    /* constrain images on small screens */
+    max-width: 100%;
+}
+
+
+
+.calendar-header {
+    padding: 0;
+    margin-top: 5px;
+    margin-bottom: 0;
+    display: flex;
+    flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    justify-content: space-around;
+    min-width: 400px;
+    border-left: #DADCE0 2px solid;
+}
+
+.weekday-header {
+    background-color: #F6F6F6;
+    color: #666;
+    padding: 3px;
+    margin: 0;
+    list-style:none;
+    flex-grow: 1;
+    flex-basis: 12%;
+    overflow: auto;
+    text-align: center;
+    font-size: 12px;
+    border-top: #DADCE0 2px solid;
+    border-right: #DADCE0 2px solid;
+    border-bottom: 0px;
+}
+
+.calendar {
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-flow: row wrap;
+    -webkit-flex-flow: row wrap;
+    justify-content: space-around;
+    min-width: 400px;
+    border-bottom: #DADCE0 2px solid;
+    border-left: #DADCE0 2px solid;
+}
+
+.day {
+    background-color: #FDFDFD;
+    padding: 3px;
+    margin: 0;
+    min-height: 120px;
+    list-style:none;
+    flex-grow: 1;
+    flex-basis: 13.5%;
+    overflow: auto;
+    cursor: pointer;
+    border-top: #DADCE0 2px solid;
+    border-right: #DADCE0 2px solid;
+    border-bottom: 0px;
+    text-align: left;
+}
+
+.othermonth {
+    background-color: #F3F3F3;
+    cursor: auto;
+}
+
+.daynumber {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #666;
+    padding: 3px;
+}
+
+.daynumber-current {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #F9F9F9;
+    background-color: #3EB34F;
+    padding: 4px;
+    border-radius: 2px;
+}
+
+.daynumber-othermonth {
+    font-size: 13.5px;
+    font-weight: 400;
+    color: #777774;
+    padding: 3px;
+}

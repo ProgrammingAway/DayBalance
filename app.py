@@ -38,13 +38,6 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 
-#@app.route("/hello/<string:name>/")
-#@login_required
-#def hello(name):
-#    return render_template(
-#    'test.html',name=name)</string:name>
-
-
 @app.route("/")
 @login_required
 def index():
@@ -59,16 +52,6 @@ def index():
     change_months = 0
     change_years = 0
 
-    # User reached route via POST (as by submitting a form via POST)
-#    if request.method == "POST":
-
-        # Ensure password was submitted
-#        elif request.form.get("password") != request.form.get("confirmation"):
-#            return apology("password does not match confirmation", 403)
-
-    # User reached route via GET (as by clicking a link or via redirect)
-#    else:
-
     current_month = todays_date.month + change_months
     current_year = todays_date.year + change_years
     current_months_name = calendar.month_name[current_month]
@@ -78,6 +61,30 @@ def index():
         todays_date=todays_date,
         current_month=current_month,
         current_year=current_year,
+        current_months_name=current_months_name,
+        weekdays_headers=weekdays_headers,
+        month_days=month_days,
+    )
+
+
+@app.route("/calendar.html")
+@login_required
+def cal(year, month):
+    """Graph daily balance."""\
+    
+    first_weekday = 6 # 0 = Monday, 6 = Sunday
+    current_calendar = calendar.Calendar(first_weekday)
+    weekdays_headers = []
+    for weekday in current_calendar.iterweekdays():
+        weekdays_headers.append(calendar.day_abbr[weekday])
+    todays_date = datetime.date(datetime.now())
+    current_months_name = calendar.month_name[month]
+    month_days = current_calendar.itermonthdates(year, month)
+
+    return render_template("calendar.html",
+        todays_date=todays_date,
+        current_month=month,
+        current_year=year,
         current_months_name=current_months_name,
         weekdays_headers=weekdays_headers,
         month_days=month_days,
@@ -173,9 +180,9 @@ def register():
         # TODO: Check password rules!
 
         # Query database for username
-        rows = db.execute("INSERT INTO users (username, hash) VALUES (:username, :pwhash)",
-                          username=request.form.get("username"),
-                          pwhash = generate_password_hash(request.form.get("password")))
+        db.execute("INSERT INTO users (username, hash) VALUES (:username, :pwhash)",
+            username=request.form.get("username"),
+            pwhash = generate_password_hash(request.form.get("password")))
 
         # Redirect user to home page
         flash('Registration successful')

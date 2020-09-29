@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Calendar
+{% endblock %}
+
+{% block main %}
+    <div class="header">
+        <button id="back" onclick="" title="Previous Month">&lt;</button>
+        <button id="forward" onclick="" title="Next Month">&gt;</button>
+        <div class="current-date">
+            {{ current_months_name }} {{ current_year }}
+        </div>
+        {% if todays_date.month != current_month and todays_date.year != current_year %}
+            <button id="current" onclick="" title="Back to current">back to current</button>
+        {% endif %}
+     </div>
+
+   <ul class="calendar-header">
+        {% for weekday_header in weekdays_headers %}
+            <li class="weekday-header">{{ weekday_header }}</li>
+        {% endfor %}
+    </ul>
+
+    <ul class="calendar" id="calendar">
+        {% for day in month_days %}
+            <li
+                {% if day.month != current_month %}
+                    class="day othermonth"
+                {% else %}
+                    class="day"
+                {% endif %}>
+                {% if day.day == todays_date.day and day.month == todays_date.month and day.year == todays_date.year %}
+                    <span class="daynumber-current">
+                {% elif day.month != current_month %}
+                    <span class="daynumber-othermonth">
+                {% else %}
+                    <span class="daynumber">
+                {% endif %}
+                {{ day.day }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

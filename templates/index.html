@@ -6,13 +6,19 @@
 
 {% block main %}
     <div class="header">
-        <button id="back" onclick="less_one_month(year, month)" title="Previous Month">&lt;</button>
-        <button id="forward" onclick="greater_one_month(year, month)" title="Next Month">&gt;</button>
+        <form action="/prev/{{ current_year }}/{{ current_month }}" method="post">
+            <button name="forwardBtn" title="Previous Month" type="submit">&lt;</button>
+        </form>
+        <form action="/next/{{ current_year }}/{{ current_month }}" method="post">
+            <button name="backBtn" title="Next Month" type="submit">&gt;</button>
+        </form>
         <div class="current-date">
             {{ current_months_name }} {{ current_year }}
         </div>
-        {% if todays_date.month != current_month and todays_date.year != current_year %}
-            <button id="current" onclick="" title="Back to current">back to current</button>
+        {% if todays_date.month != current_month or todays_date.year != current_year %}
+            <form action="/" method="post">
+                <button name="current" title="Back to current" type="submit">Back to current</button>
+            </form>
         {% endif %}
      </div>
 

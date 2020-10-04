@@ -1,7 +1,7 @@
 import os
 
 from cs50 import SQL
-from flask import Flask, flash, jsonify, redirect, render_template, request, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
@@ -35,23 +35,29 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 
-def less_one_month(year, month):
+@app.route("/prev/<int:year>/<int:month>", methods=["POST"])
+@login_required
+def previous_month(year, month):
     """ subrtact one month from given month and year """
 
     if month == 1:
-        return index(year-1, 12)
+        return index(year = year-1, month = 12)
     else:
-        return index(year, month-1)
+        return index(year = year, month = month-1)
 
-def greater_one_month(year, month):
-    """ subrtact one month from given month and year """
+
+@app.route("/next/<int:year>/<int:month>", methods=["POST"])
+@login_required
+def next_month(year, month):
+    """ add one month from given month and year """
 
     if month == 12:
-        return index(year+1, 1)
+        return index(year = year+1, month = 1)
     else:
-        return index(year, month+1)
+        return index(year = year, month = month+1)
 
-@app.route("/")
+
+@app.route("/", methods=["GET", "POST"])
 @login_required
 def index(year=0, month=0):
     """Show balance calendar"""
@@ -66,9 +72,6 @@ def index(year=0, month=0):
     if year == 0 or month == 0:
         year = todays_date.year
         month = todays_date.month
-
-    current_months_name = calendar.month_name[month]
-    month_days = current_calendar.itermonthdates(year, month)
 
     current_months_name = calendar.month_name[month]
     month_days = current_calendar.itermonthdates(year, month)

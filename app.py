@@ -1,8 +1,9 @@
 import os
 
-from cs50 import SQL
-from flask import Flask, flash, jsonify, redirect, render_template, request, session, url_for
+from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
+#from flask_sqlalchemy import SQLAlchemy
+from cs50 import SQL
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -39,7 +40,8 @@ db = SQL("sqlite:///finance.db")
 @login_required
 def previous_month(year, month):
     """ subrtact one month from given month and year """
-
+    
+    # send previous month and year to the index function
     if month == 1:
         return index(year = year-1, month = 12)
     else:
@@ -51,6 +53,7 @@ def previous_month(year, month):
 def next_month(year, month):
     """ add one month from given month and year """
 
+    # send next month and year to the index function
     if month == 12:
         return index(year = year+1, month = 1)
     else:
@@ -60,22 +63,29 @@ def next_month(year, month):
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index(year=0, month=0):
-    """Show balance calendar"""
+    """Show current balance calendar"""
 
     first_weekday = 6 # 0 = Monday, 6 = Sunday
+
+    # create calendar based on first weekday
     current_calendar = calendar.Calendar(first_weekday)
+
+    # create weekday headers based on first weekday
     weekdays_headers = []
     for weekday in current_calendar.iterweekdays():
         weekdays_headers.append(calendar.day_abbr[weekday])
 
+    # set year and month to todays date if not supplied
     todays_date = datetime.date(datetime.now())
     if year == 0 or month == 0:
         year = todays_date.year
         month = todays_date.month
 
+    # retrieve current month name and days for current month
     current_months_name = calendar.month_name[month]
     month_days = current_calendar.itermonthdates(year, month)
 
+    # render index.html with current variables
     return render_template("index.html",
         todays_date=todays_date,
         current_month=month,
@@ -97,6 +107,13 @@ def graph():
 @login_required
 def history():
     """Show history of transactions"""
+    return apology("TODO")
+
+
+@app.route("/settings")
+@login_required
+def settings():
+    """Show app settings"""
     return apology("TODO")
 
 

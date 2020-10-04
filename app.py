@@ -9,7 +9,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 import calendar
 from datetime import date, datetime, timedelta
 
-from helpers import apology, login_required, usd
+from helpers import apology, login_required
 
 # Configure application
 app = Flask(__name__)
@@ -24,9 +24,6 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
-
-# Custom filter
-app.jinja_env.filters["usd"] = usd
 
 # Configure session to use filesystem (instead of signed cookies)
 app.config["SESSION_FILE_DIR"] = mkdtemp()
@@ -70,7 +67,7 @@ def index():
 @app.route("/calendar.html")
 @login_required
 def cal(year, month):
-    """Graph daily balance."""\
+    """Show balance calendar"""
     
     first_weekday = 6 # 0 = Monday, 6 = Sunday
     current_calendar = calendar.Calendar(first_weekday)

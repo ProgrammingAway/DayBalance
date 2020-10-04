@@ -6,8 +6,8 @@
 
 {% block main %}
     <div class="header">
-        <button id="back" onclick="" title="Previous Month">&lt;</button>
-        <button id="forward" onclick="" title="Next Month">&gt;</button>
+        <button id="back" onclick="less_one_month(year, month)" title="Previous Month">&lt;</button>
+        <button id="forward" onclick="greater_one_month(year, month)" title="Next Month">&gt;</button>
         <div class="current-date">
             {{ current_months_name }} {{ current_year }}
         </div>

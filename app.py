@@ -35,9 +35,25 @@ Session(app)
 db = SQL("sqlite:///finance.db")
 
 
+def less_one_month(year, month):
+    """ subrtact one month from given month and year """
+
+    if month == 1:
+        return index(year-1, 12)
+    else:
+        return index(year, month-1)
+
+def greater_one_month(year, month):
+    """ subrtact one month from given month and year """
+
+    if month == 12:
+        return index(year+1, 1)
+    else:
+        return index(year, month+1)
+
 @app.route("/")
 @login_required
-def index():
+def index(year=0, month=0):
     """Show balance calendar"""
 
     first_weekday = 6 # 0 = Monday, 6 = Sunday
@@ -45,40 +61,19 @@ def index():
     weekdays_headers = []
     for weekday in current_calendar.iterweekdays():
         weekdays_headers.append(calendar.day_abbr[weekday])
+
     todays_date = datetime.date(datetime.now())
-    change_months = 0
-    change_years = 0
+    if year == 0 or month == 0:
+        year = todays_date.year
+        month = todays_date.month
 
-    current_month = todays_date.month + change_months
-    current_year = todays_date.year + change_years
-    current_months_name = calendar.month_name[current_month]
-    month_days = current_calendar.itermonthdates(current_year, current_month)
-
-    return render_template("index.html",
-        todays_date=todays_date,
-        current_month=current_month,
-        current_year=current_year,
-        current_months_name=current_months_name,
-        weekdays_headers=weekdays_headers,
-        month_days=month_days,
-    )
-
-
-@app.route("/calendar.html")
-@login_required
-def cal(year, month):
-    """Show balance calendar"""
-    
-    first_weekday = 6 # 0 = Monday, 6 = Sunday
-    current_calendar = calendar.Calendar(first_weekday)
-    weekdays_headers = []
-    for weekday in current_calendar.iterweekdays():
-        weekdays_headers.append(calendar.day_abbr[weekday])
-    todays_date = datetime.date(datetime.now())
     current_months_name = calendar.month_name[month]
     month_days = current_calendar.itermonthdates(year, month)
 
-    return render_template("calendar.html",
+    current_months_name = calendar.month_name[month]
+    month_days = current_calendar.itermonthdates(year, month)
+
+    return render_template("index.html",
         todays_date=todays_date,
         current_month=month,
         current_year=year,

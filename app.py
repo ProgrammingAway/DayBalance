@@ -18,6 +18,19 @@ app = Flask(__name__)
 # Ensure templates are auto-reloaded
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+# set up database using SQLAlchemy
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///daybalance.db'
+#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+#db = SQLAlchemy(app)
+
+#class User(db.Model):
+#    id = db.Column(db.Integer, primary_key=True)
+#    username = db.Column(db.String(80), unique=True, nullable=False)
+#    hash = db.Column(db.String(120), unique=True, nullable=False)
+
+# Configure CS50 Library to use SQLite database
+db = SQL("sqlite:///finance.db")
+
 # Ensure responses aren't cached
 @app.after_request
 def after_request(response):
@@ -31,9 +44,6 @@ app.config["SESSION_FILE_DIR"] = mkdtemp()
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
-
-# Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
 
 
 @app.route("/prev/<int:year>/<int:month>", methods=["POST"])
@@ -136,15 +146,17 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username",
-                          username=request.form.get("username"))
+        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
+        #row = User.query.filter_by(username=request.form.get("username")).first()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
+        #if row is None or not check_password_hash(row.hash, request.form.get("password")):
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
         session["user_id"] = rows[0]["id"]
+        #session["user_id"] = row.id
 
         # Redirect user to home page
         flash('You were successfully logged in')
@@ -195,6 +207,10 @@ def register():
         db.execute("INSERT INTO users (username, hash) VALUES (:username, :pwhash)",
             username=request.form.get("username"),
             pwhash = generate_password_hash(request.form.get("password")))
+        #new_user = User(username=request.form.get("username"), 
+        #    hash=generate_password_hash(request.form.get("password")))
+        #db.session.add(new_user)
+        #db.session.commit()
 
         # Redirect user to home page
         flash('Registration successful')

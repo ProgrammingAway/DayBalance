@@ -44,6 +44,9 @@
                     <span class="daynumber">
                 {% endif %}
                 {{ day.day }}</span>
+                <form action="/add/{{ day.year }}/{{ day.month }}/{{ day.day }}" method="post">
+                    <button class="hide" name="current" title="New Transaction" type="submit">+</button>
+                </form>
             </li>
         {% endfor %}
     </ul>

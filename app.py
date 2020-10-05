@@ -70,6 +70,14 @@ def next_month(year, month):
         return index(year = year, month = month+1)
 
 
+@app.route("/add/<int:year>/<int:month>/<int:day>", methods=["POST"])
+@login_required
+def add_transaction(year, month, day):
+    """ add one month from given month and year """
+
+    return apology("TODO")
+
+
 @app.route("/", methods=["GET", "POST"])
 @login_required
 def index(year=0, month=0):

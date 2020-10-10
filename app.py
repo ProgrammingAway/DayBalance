@@ -2,8 +2,7 @@ import os
 
 from flask import Flask, flash, jsonify, redirect, render_template, request, session
 from flask_session import Session
-#from flask_sqlalchemy import SQLAlchemy
-from cs50 import SQL
+from flask_sqlalchemy import SQLAlchemy
 from tempfile import mkdtemp
 from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -16,20 +15,34 @@ from helpers import apology, login_required
 app = Flask(__name__)
 
 # Ensure templates are auto-reloaded
-app.config["TEMPLATES_AUTO_RELOAD"] = True
+#app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # set up database using SQLAlchemy
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///daybalance.db'
-#app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-#db = SQLAlchemy(app)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///daybalance.db'
+app.config['SECRET_KEY'] = "lkjhoiuehbakj"
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
 
-#class User(db.Model):
-#    id = db.Column(db.Integer, primary_key=True)
-#    username = db.Column(db.String(80), unique=True, nullable=False)
-#    hash = db.Column(db.String(120), unique=True, nullable=False)
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    hash = db.Column(db.String(120), unique=True, nullable=False)
+    transactions = db.relationship('Transaction', backref='user', lazy=True)
 
-# Configure CS50 Library to use SQLite database
-db = SQL("sqlite:///finance.db")
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(40), nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
+    amount = db.Column(db.Float, nullable=False)
+    description = db.Column(db.String(200))
+    account = db.Column(db.String(40))
+    category = db.Column(db.String(40))
+    cleared = db.Column(db.Boolean)
+    income = db.Column(db.Boolean)
+    repeat = db.Column(db.Boolean)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+db.create_all()
 
 # Ensure responses aren't cached
 @app.after_request
@@ -70,12 +83,52 @@ def next_month(year, month):
         return index(year = year, month = month+1)
 
 
-@app.route("/add/<int:year>/<int:month>/<int:day>", methods=["POST"])
+@app.route("/add", methods=["GET", "POST"])
+#@app.route("/add/<int:year>/<int:month>/<int:day>", methods=["GET", "POST"])
 @login_required
-def add_transaction(year, month, day):
+#def add_transaction(year, month, day):
+def add_transaction():
     """ add one month from given month and year """
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
 
-    return apology("TODO")
+        # Ensure title was submitted
+        if not request.form.get("title"):
+            return apology("must provide transaction title", 403)
+
+        # Ensure date was submitted
+        elif not request.form.get("date"):
+            return apology("must provide transaction date", 403)
+
+        # Ensure amount was submitted
+        elif not request.form.get("amount"):
+            return apology("must provide transaction amount", 403)
+
+        year, month, day = map(int, request.form.get("date").split('-'))
+
+        # Create new transaction
+        new_transaction = Transaction(
+            user_id=session["user_id"],
+            title=request.form.get("title"), 
+            date=datetime(year, month, day),
+            amount=request.form.get("amount"),
+            account=(request.form.get("account") if request.form.get("account") else ""),
+            category=(request.form.get("category") if request.form.get("category") else ""),
+            description=(request.form.get("description") if request.form.get("description") else ""),
+            cleared=(request.form.get("cleared") if request.form.get("cleared") else False),
+            income=(request.form.get("income") if request.form.get("income") else False),
+            repeat=(request.form.get("repeat") if request.form.get("repeat") else False),
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        # Redirect user to home page
+        flash('Transaction Added')
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        return render_template("transaction.html")
 
 
 @app.route("/", methods=["GET", "POST"])
@@ -154,17 +207,14 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for username
-        rows = db.execute("SELECT * FROM users WHERE username = :username", username=request.form.get("username"))
-        #row = User.query.filter_by(username=request.form.get("username")).first()
+        row = User.query.filter_by(username=request.form.get("username")).first()
 
         # Ensure username exists and password is correct
-        if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
-        #if row is None or not check_password_hash(row.hash, request.form.get("password")):
+        if row is None or not check_password_hash(row.hash, request.form.get("password")):
             return apology("invalid username and/or password", 403)
 
         # Remember which user has logged in
-        session["user_id"] = rows[0]["id"]
-        #session["user_id"] = row.id
+        session["user_id"] = row.id
 
         # Redirect user to home page
         flash('You were successfully logged in')
@@ -212,13 +262,10 @@ def register():
         # TODO: Check password rules!
 
         # Query database for username
-        db.execute("INSERT INTO users (username, hash) VALUES (:username, :pwhash)",
-            username=request.form.get("username"),
-            pwhash = generate_password_hash(request.form.get("password")))
-        #new_user = User(username=request.form.get("username"), 
-        #    hash=generate_password_hash(request.form.get("password")))
-        #db.session.add(new_user)
-        #db.session.commit()
+        new_user = User(username=request.form.get("username"), 
+            hash=generate_password_hash(request.form.get("password")))
+        db.session.add(new_user)
+        db.session.commit()
 
         # Redirect user to home page
         flash('Registration successful')

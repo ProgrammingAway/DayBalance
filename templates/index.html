@@ -12,14 +12,13 @@
         <form action="/next/{{ current_year }}/{{ current_month }}" method="post">
             <button name="backBtn" title="Next Month" type="submit">&gt;</button>
         </form>
+        {% if todays_date.month != current_month or todays_date.year != current_year %}
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Back to current</a></li>
+        {% endif %}
         <div class="current-date">
             {{ current_months_name }} {{ current_year }}
         </div>
-        {% if todays_date.month != current_month or todays_date.year != current_year %}
-            <form action="/" method="post">
-                <button name="current" title="Back to current" type="submit">Back to current</button>
-            </form>
-        {% endif %}
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('add_transaction') }}">Add Transaction</a></li>
      </div>
 
    <ul class="calendar-header">
@@ -48,11 +47,11 @@
                     <span class="daynumber">
                 {% endif %}
                 {{ day.day }}</span>
-
+<!--
                 <form action="/add/{{ day.year }}/{{ day.month }}/{{ day.day }}" method="post">
                     <button class="hide" name="current" title="New Transaction" type="submit">+</button>
                 </form>
-
+-->
                 <ul class="transactions">
                     {% if day.month|string in transactions and day.day|string in transactions[day.month|string] %}
                         {% for transaction in transactions[day.month|string][day.day|string]|sort(attribute="start_time") %}

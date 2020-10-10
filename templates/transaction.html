@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Add Transaction
+{% endblock %}
+
+{% block main %}
+    <form action="/add" method="post">
+        <div class="form-group">
+            <input autofocus class="form-control" name="title" placeholder="Title" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="amount" placeholder="10.00" type="number" min="1" step="any">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="date" placeholder="Date" type="date">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="account" placeholder="Account" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="category" placeholder="Category" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="description" placeholder="Description" type="text">
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="cleared" type="checkbox" value="Cleared">
+            <label for="cleared"> Transaction Cleared?</label><br>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="income" type="checkbox" value="Income">
+            <label for="income"> Income?</label><br>
+        </div>
+        <div class="form-group">
+            <input class="form-control" name="repeat" type="checkbox" value="Repeat">
+            <label for="repeat"> Repeated?</label><br>
+        </div>
+      
+        <button class="btn btn-primary" type="submit">Submit</button>
+    </form>
+{% endblock %}

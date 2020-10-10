@@ -115,9 +115,9 @@ def add_transaction():
             account=(request.form.get("account") if request.form.get("account") else ""),
             category=(request.form.get("category") if request.form.get("category") else ""),
             description=(request.form.get("description") if request.form.get("description") else ""),
-            cleared=(request.form.get("cleared") if request.form.get("cleared") else False),
-            income=(request.form.get("income") if request.form.get("income") else False),
-            repeat=(request.form.get("repeat") if request.form.get("repeat") else False),
+            cleared=(True if request.form.get("cleared") == "Cleared" else False),
+            income=(True if request.form.get("income") == "Income" else False),
+            repeat=(True if request.form.get("repeat") == "Repeat" else False),
         )
         db.session.add(new_transaction)
         db.session.commit()

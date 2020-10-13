@@ -1,11 +1,3 @@
-.hide {
-    display: none;
-}
-  
-.day:hover .hide {
-    display: block;
-}
-
 nav .navbar-brand
 {
     /* size for brand */
@@ -54,70 +46,90 @@ main img
     max-width: 100%;
 }
 
+.title-row {
+    border:3px solid black;
+}
 
+.btn-left {
+    border:3px solid red;
+}
+
+.btn-right {
+    border:3px solid green;
+}
+
+.title-center {
+    border:3px solid blue;
+}
 
 .calendar-header {
+    min-width: 400px;
+    padding-left: 0;
     padding: 0;
     margin-top: 5px;
     margin-bottom: 0;
-    display: flex;
-    flex-flow: row wrap;
-    -webkit-flex-flow: row wrap;
-    justify-content: space-around;
-    min-width: 400px;
     border-left: #DADCE0 2px solid;
 }
 
 .weekday-header {
+    list-style: none;
+    font-size: 12px;
+    text-align: center;
     background-color: #F6F6F6;
     color: #666;
     padding: 3px;
     margin: 0;
-    list-style:none;
-    flex-grow: 1;
-    flex-basis: 12%;
     overflow: auto;
-    text-align: center;
-    font-size: 12px;
     border-top: #DADCE0 2px solid;
     border-right: #DADCE0 2px solid;
     border-bottom: 0px;
 }
 
 .calendar {
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-flow: row wrap;
-    -webkit-flex-flow: row wrap;
-    justify-content: space-around;
+    border:3px solid black;
     min-width: 400px;
-    border-bottom: #DADCE0 2px solid;
-    border-left: #DADCE0 2px solid;
+    padding-left: 0;
+    /*border-bottom: #DADCE0 2px solid;
+    border-left: #DADCE0 2px solid;*/
+}
+
+.day-header {
+    border:3px solid green;
+    background-color: #F0F0F0;
 }
 
 .day {
+    border:3px solid blue;
+    list-style: none;
+    text-align: left;
+    min-height: 120px;
     background-color: #FDFDFD;
     padding: 3px;
     margin: 0;
-    min-height: 120px;
-    list-style:none;
-    flex-grow: 1;
-    flex-basis: 13.5%;
     overflow: auto;
     cursor: pointer;
-    border-top: #DADCE0 2px solid;
+    /*border-top: #DADCE0 2px solid;
     border-right: #DADCE0 2px solid;
-    border-bottom: 0px;
-    text-align: left;
+    border-bottom: 0px;*/
 }
 
-.othermonth {
+.day-othermonth {
     background-color: #F3F3F3;
     cursor: auto;
 }
 
+.daybalance {
+    border:3px solid black;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #666;
+    padding: 3px;
+    text-align: right;
+    margin-right: 0;
+}
+
 .daynumber {
+    border:3px solid red;
     font-size: 13.5px;
     font-weight: 700;
     color: #666;
@@ -125,8 +137,6 @@ main img
 }
 
 .daynumber-current {
-    font-size: 13.5px;
-    font-weight: 700;
     color: #F9F9F9;
     background-color: #3EB34F;
     padding: 4px;
@@ -134,10 +144,8 @@ main img
 }
 
 .daynumber-othermonth {
-    font-size: 13.5px;
     font-weight: 400;
     color: #777774;
-    padding: 3px;
 }
 
 ul.transactions li {

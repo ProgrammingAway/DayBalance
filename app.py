@@ -59,32 +59,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 
-@app.route("/prev/<int:year>/<int:month>", methods=["POST"])
-@login_required
-def previous_month(year, month):
-    """ subrtact one month from given month and year """
-    
-    # send previous month and year to the index function
-    if month == 1:
-        return index(year = year-1, month = 12)
-    else:
-        return index(year = year, month = month-1)
-
-
-@app.route("/next/<int:year>/<int:month>", methods=["POST"])
-@login_required
-def next_month(year, month):
-    """ add one month from given month and year """
-
-    # send next month and year to the index function
-    if month == 12:
-        return index(year = year+1, month = 1)
-    else:
-        return index(year = year, month = month+1)
-
-
 @app.route("/add", methods=["GET", "POST"])
-#@app.route("/add/<int:year>/<int:month>/<int:day>", methods=["GET", "POST"])
 @login_required
 #def add_transaction(year, month, day):
 def add_transaction():
@@ -132,6 +107,7 @@ def add_transaction():
 
 
 @app.route("/", methods=["GET", "POST"])
+@app.route("/<int:year>/<int:month>", methods=["GET", "POST"])
 @login_required
 def index(year=0, month=0):
     """Show current balance calendar"""
@@ -155,6 +131,7 @@ def index(year=0, month=0):
     # retrieve current month name and days for current month
     current_months_name = calendar.month_name[month]
     month_days = current_calendar.itermonthdates(year, month)
+    user = User.query.filter_by(id=session["user_id"]).first()
 
     # render index.html with current variables
     return render_template("index.html",
@@ -164,6 +141,8 @@ def index(year=0, month=0):
         current_months_name=current_months_name,
         weekdays_headers=weekdays_headers,
         month_days=month_days,
+        balance=100,
+        transactions=user.transactions,
     )
 
 

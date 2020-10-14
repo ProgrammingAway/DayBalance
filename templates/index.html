@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block main %}
+    {% set ns = namespace(curr_balance=balance) %}
     <div class="row justify-content-center title-row">
         {% if current_month == 1 %}
             <form class="col-1 order-1 btn-left ml-0" action="/{{ current_year-1 }}/12" method="post">
@@ -72,7 +73,12 @@
                     {% endif %}
                     {{ day.day }}</span>
 
-                    <span class="daybalance">{{ "$%.2f"|format(balance) }}</span>
+                    {% if ns.curr_balance < 0 %}
+                        <span class="daybalance daybalance-negative">
+                    {% else %}
+                        <span class="daybalance">
+                    {% endif %}
+                    {{ "$%.2f"|format(ns.curr_balance) }}</span>
                 </div>
 
                 <ul class="transactions">
@@ -94,7 +100,7 @@
                                 {% endif %}>
                                 {{ transaction.title }}  {{ "$%.2f"|format(transaction.amount) }}
                             </li>
-                            {% set balance = (balance + transaction.amount) if transaction.income  else (balance - transaction.amount) %}
+                            {% set ns.curr_balance = (ns.curr_balance + transaction.amount) if transaction.income == True else (ns.curr_balance - transaction.amount) %}
                         {% endif %}
                     {% endfor %}
                 </ul>

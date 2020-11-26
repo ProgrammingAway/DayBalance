@@ -135,6 +135,13 @@ def index(year=0, month=0):
     month_days = current_calendar.itermonthdates(year, month)
     user = User.query.filter_by(id=session["user_id"]).first()
 
+#    prev_transactions = Transaction.query.filter(
+#        and_(Transaction.id == session["user_id"],
+#        Transaction.date >= user.start_date, Transaction.date < month_days.next())
+#    )
+    # find transactions between user.start_date to month_days[0].day/month/year if any
+    # for each transaction, add or subtract transaction from start_balance 
+
     # render index.html with current variables
     return render_template("index.html",
         todays_date=todays_date,
@@ -250,12 +257,32 @@ def register():
 
         # TODO: Check password rules!
 
+        year, month, day = map(int, request.form.get("start_date").split('-'))
+
         # Query database for username
         new_user = User(username=request.form.get("username"), 
             hash=generate_password_hash(request.form.get("password")),
-            start_date=request.form.get("start_date"),
+            start_date=datetime(year, month, day),
             start_balance=request.form.get("start_balance"))
         db.session.add(new_user)
+        db.session.commit()
+
+        row = User.query.filter_by(username=request.form.get("username")).first()
+
+        # Create new transaction
+        new_transaction = Transaction(
+            user_id=row.id,
+            title="Initial Balance", 
+            date=datetime(year, month, day),
+            amount=request.form.get("start_balance"),
+            account="",
+            category="",
+            description="",
+            cleared=True,
+            income=True,
+            repeat=False,
+        )
+        db.session.add(new_transaction)
         db.session.commit()
 
         # Redirect user to home page

@@ -63,7 +63,7 @@
                 data-month="{{ day.month }}"
                 data-day="{{ day.day }}">
 
-                <div class="day-header">
+                <div class="row no-gutters day-header">
                     {% if day.day == todays_date.day and day.month == todays_date.month and day.year == todays_date.year %}
                         <span class="daynumber daynumber-current">
                     {% elif day.month != current_month %}
@@ -74,9 +74,9 @@
                     {{ day.day }}</span>
 
                     {% if ns.curr_balance < 0 %}
-                        <span class="daybalance daybalance-negative">
+                        <span class="col daybalance daybalance-negative">
                     {% else %}
-                        <span class="daybalance">
+                        <span class="col daybalance">
                     {% endif %}
                     {{ "$%.2f"|format(ns.curr_balance) }}</span>
                 </div>
@@ -89,7 +89,6 @@
                                     class="transaction greyed"
                                 {% else %}
                                     class="transaction"
-                                    style="background-color:{{ transaction["color"] }}"
                                 {% endif %}
                                 data-year="{{ day.year }}"
                                 data-month="{{ day.month }}"

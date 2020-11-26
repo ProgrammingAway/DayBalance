@@ -27,6 +27,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     hash = db.Column(db.String(120), unique=True, nullable=False)
+    start_date = db.Column(db.DateTime, nullable=False)
+    start_balance = db.Column(db.Float, nullable=False)
     transactions = db.relationship('Transaction', backref='user', lazy=True)
 
 class Transaction(db.Model):
@@ -141,7 +143,7 @@ def index(year=0, month=0):
         current_months_name=current_months_name,
         weekdays_headers=weekdays_headers,
         month_days=month_days,
-        balance=100,
+        balance=1010,
         transactions=user.transactions,
     )
 
@@ -238,11 +240,21 @@ def register():
         elif request.form.get("password") != request.form.get("confirmation"):
             return apology("password does not match confirmation", 403)
 
+        # Ensure start date was submitted
+        elif not request.form.get("start_date"):
+            return apology("must provide budget start date", 403)
+
+        # Ensure password was submitted
+        elif not request.form.get("start_balance"):
+            return apology("must provide budget start balance", 403)
+
         # TODO: Check password rules!
 
         # Query database for username
         new_user = User(username=request.form.get("username"), 
-            hash=generate_password_hash(request.form.get("password")))
+            hash=generate_password_hash(request.form.get("password")),
+            start_date=request.form.get("start_date"),
+            start_balance=request.form.get("start_balance"))
         db.session.add(new_user)
         db.session.commit()
 

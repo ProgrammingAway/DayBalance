@@ -45,7 +45,7 @@ main img
     /* constrain images on small screens */
     max-width: 100%;
 }
-
+/*
 .title-row {
     border:3px solid black;
 }
@@ -61,7 +61,7 @@ main img
 .title-center {
     border:3px solid blue;
 }
-
+*/
 .calendar-header {
     min-width: 400px;
     padding-left: 0;
@@ -86,20 +86,20 @@ main img
 }
 
 .calendar {
-    border:3px solid black;
+    /*border:3px solid black;*/
     min-width: 400px;
     padding-left: 0;
-    /*border-bottom: #DADCE0 2px solid;
-    border-left: #DADCE0 2px solid;*/
+    border-bottom: #DADCE0 2px solid;
+    border-left: #DADCE0 2px solid;
 }
 
 .day-header {
-    border:3px solid green;
+    /*border:3px solid green;*/
     background-color: #F0F0F0;
 }
 
 .day {
-    border:3px solid blue;
+    /*border:3px solid blue;*/
     list-style: none;
     text-align: left;
     min-height: 120px;
@@ -108,9 +108,9 @@ main img
     margin: 0;
     overflow: auto;
     cursor: pointer;
-    /*border-top: #DADCE0 2px solid;
+    border-top: #DADCE0 2px solid;
     border-right: #DADCE0 2px solid;
-    border-bottom: 0px;*/
+    border-bottom: 0px;
 }
 
 .day-othermonth {
@@ -119,13 +119,12 @@ main img
 }
 
 .daybalance {
-    border:3px solid black;
+    /*border:3px solid black;*/
     font-size: 13.5px;
     font-weight: 700;
     color: green;
     padding: 3px;
     text-align: right;
-    margin-right: 0;
 }
 
 .daybalance-negative {
@@ -133,7 +132,7 @@ main img
 }
 
 .daynumber {
-    border:3px solid red;
+    /*border:3px solid red;*/
     font-size: 13.5px;
     font-weight: 700;
     color: #666;

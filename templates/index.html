@@ -97,7 +97,9 @@
                                 {% if transaction.repeat == True %}
                                     data-recurrent="1"
                                 {% endif %}>
-                                {{ transaction.title }}  {{ "$%.2f"|format(transaction.amount) }}
+                                <a href="{{ url_for('edit_transaction', transaction_id = transaction.id) }}">
+                                    {{ transaction.title }} {{ "$%.2f"|format(transaction.amount) }}
+                                </a>
                             </li>
                             {% set ns.curr_balance = (ns.curr_balance + transaction.amount) if transaction.income == True else (ns.curr_balance - transaction.amount) %}
                         {% endif %}

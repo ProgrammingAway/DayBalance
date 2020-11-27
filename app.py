@@ -63,9 +63,8 @@ Session(app)
 
 @app.route("/add", methods=["GET", "POST"])
 @login_required
-#def add_transaction(year, month, day):
 def add_transaction():
-    """ add one month from given month and year """
+    """ add transaction """
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
 
@@ -109,6 +108,72 @@ def add_transaction():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("transaction.html")
+
+
+@app.route("/edit", methods=["GET", "POST"])
+@app.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
+@login_required
+def edit_transaction(transaction_id):
+    """ edit transaction """
+
+    edited_transaction = Transaction.query.filter_by(id=transaction_id).one()
+
+    # User reached route via POST (as by submitting a form via POST)
+    if request.method == "POST":
+
+        # Ensure title was submitted
+        if not request.form.get("title"):
+            return apology("must provide transaction title", 403)
+
+        # Ensure date was submitted
+        elif not request.form.get("date"):
+            return apology("must provide transaction date", 403)
+
+        # Ensure amount was submitted
+        elif not request.form.get("amount"):
+            return apology("must provide transaction amount", 403)
+
+        year, month, day = map(int, request.form.get("date").split('-'))
+
+        # Edit transaction
+        edited_transaction.title=request.form.get("title")
+        edited_transaction.date=datetime(year, month, day)
+        edited_transaction.amount=request.form.get("amount")
+        edited_transaction.account=(request.form.get("account") if request.form.get("account") else "")
+        edited_transaction.category=(request.form.get("category") if request.form.get("category") else "")
+        edited_transaction.description=(request.form.get("description") if request.form.get("description") else "")
+        edited_transaction.cleared=(True if request.form.get("cleared") == "Cleared" else False)
+        edited_transaction.income=(True if request.form.get("income") == "Income" else False)
+        edited_transaction.repeat=(True if request.form.get("repeat") == "Repeat" else False)
+
+        db.session.commit()
+
+        # Redirect user to home page
+        flash('Transaction Modified')
+        return redirect("/")
+
+    # User reached route via GET (as by clicking a link or via redirect)
+    else:
+        date = str(edited_transaction.date.year) + "-" + str(edited_transaction.date.month) + "-" + str(edited_transaction.date.day)
+        return render_template("edit_transaction.html", 
+            transaction=edited_transaction,
+            date=date,
+        )
+
+
+@app.route("/delete", methods=["GET"])
+@app.route("/delete/<int:transaction_id>", methods=["GET"])
+@login_required
+def delete_transaction(transaction_id):
+    """ delete transaction """
+
+    delete_transaction = Transaction.query.filter_by(id=transaction_id).one()
+    db.session.delete(delete_transaction)
+    db.session.commit()
+
+    # Redirect user to home page
+    flash('Transaction Deleted')
+    return redirect("/")
 
 
 @app.route("/", methods=["GET", "POST"])

@@ -29,7 +29,7 @@ class User(db.Model):
     hash = db.Column(db.String(120), unique=True, nullable=False)
     start_date = db.Column(db.DateTime, nullable=False)
     start_balance = db.Column(db.Float, nullable=False)
-    transactions = db.relationship('Transaction', backref='user', lazy=True)
+    transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -96,7 +96,10 @@ def add_transaction():
             income=(True if request.form.get("income") == "Income" else False),
             repeat=(True if request.form.get("repeat") == "Repeat" else False),
         )
-        db.session.add(new_transaction)
+
+        user = User.query.filter_by(id=session["user_id"]).first()
+        user.transactions.append(new_transaction)
+        #db.session.add(new_transaction)
         db.session.commit()
 
         # Redirect user to home page
@@ -135,12 +138,18 @@ def index(year=0, month=0):
     month_days = current_calendar.itermonthdates(year, month)
     user = User.query.filter_by(id=session["user_id"]).first()
 
-#    prev_transactions = Transaction.query.filter(
-#        and_(Transaction.id == session["user_id"],
-#        Transaction.date >= user.start_date, Transaction.date < month_days.next())
-#    )
+    month_day1 = list(current_calendar.itermonthdates(year, month))[0]
+    prev_transactions = Transaction.query.filter(Transaction.user_id == session["user_id"],
+        Transaction.date >= user.start_date, Transaction.date < month_day1)
     # find transactions between user.start_date to month_days[0].day/month/year if any
     # for each transaction, add or subtract transaction from start_balance 
+
+    month_start_balance = 0
+    for transaction in prev_transactions:
+        if transaction.income == True:
+            month_start_balance = month_start_balance + transaction.amount
+        else:
+            month_start_balance = month_start_balance - transaction.amount
 
     # render index.html with current variables
     return render_template("index.html",
@@ -150,7 +159,7 @@ def index(year=0, month=0):
         current_months_name=current_months_name,
         weekdays_headers=weekdays_headers,
         month_days=month_days,
-        balance=1010,
+        balance=month_start_balance,
         transactions=user.transactions,
     )
 

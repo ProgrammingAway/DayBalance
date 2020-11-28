@@ -107,7 +107,6 @@ main img
     padding: 3px;
     margin: 0;
     overflow: auto;
-    cursor: pointer;
     border-top: #DADCE0 2px solid;
     border-right: #DADCE0 2px solid;
     border-bottom: 0px;
@@ -141,7 +140,8 @@ main img
 
 .daynumber-current {
     color: #F9F9F9;
-    background-color: #3EB34F;
+    background-color: #9090ee;
+/*    background-color: #3EB34F;*/
     padding: 4px;
     border-radius: 2px;
 }
@@ -151,15 +151,29 @@ main img
     color: #777774;
 }
 
-ul.transactions li {
-    background-color: #444;
-    color: #FEFEFE;
+.transaction {
     margin-bottom: 1px;
-    padding: 1px 4px 2px 2px;
-    cursor: pointer;
-    border-radius: 2px;
+    padding: 1px 4px 2px 4px;
+    border-radius: 4px;
+    text-underline-position: below;
 }
 
-.transaction.greyed {
-    background-color:#B8B8B8 !important;
+.transactions a:link {
+    color: black;
+    background-color: transparent;
+    text-decoration: underline;
+}
+  
+.transactions a:visited {
+    color: black;
+    background-color: transparent;
+    text-decoration: underline;
+}
+  
+.transaction-green {
+    background-color: #90ee90;
+}
+
+.transaction-red {
+    background-color: #ee9090;
 }

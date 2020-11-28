@@ -161,7 +161,7 @@ def edit_transaction(transaction_id):
         )
 
 
-@app.route("/delete", methods=["GET"])
+#@app.route("/delete", methods=["GET"])
 @app.route("/delete/<int:transaction_id>", methods=["GET"])
 @login_required
 def delete_transaction(transaction_id):
@@ -176,7 +176,7 @@ def delete_transaction(transaction_id):
     return redirect("/")
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET"])
 @app.route("/<int:year>/<int:month>", methods=["GET", "POST"])
 @login_required
 def index(year=0, month=0):

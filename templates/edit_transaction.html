@@ -73,8 +73,19 @@
             </div>
         </div>
       
-        <button class="btn btn-primary" type="submit">Submit</button>
-        <a href="{{ url_for('delete_transaction',transaction_id = transaction.id) }}">Delete</a>
-        <a href="{{ url_for('index') }}">Cancel</a>
+        <div class="form-group row justify-content-center">
+            <div class="col-1">
+                <button class="btn btn-primary" type="submit">Submit</button>
+            </div>
+            <div class="col-1">
+                <button class="btn btn-cancel" onClick="window.location.href='/';">Cancel</button>
+                <!-- <a href="{{ url_for('index') }}">Cancel</a> -->
+            </div>
+            <div class="col-1">
+                <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction.id }}';">Delete</button> -->
+                <a href="{{ url_for('delete_transaction',transaction_id = transaction.id) }}">Delete</a>
+            </div>
+        </div>
+
     </form>
 {% endblock %}

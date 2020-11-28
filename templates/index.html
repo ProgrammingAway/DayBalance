@@ -81,30 +81,30 @@
                     {{ "$%.2f"|format(ns.curr_balance) }}</span>
                 </div>
 
-                <ul class="transactions">
+                <div class="transactions">
                     {% for transaction in transactions %}
                         {% if transaction.date.month == day.month and transaction.date.day == day.day and transaction.date.year == day.year %}
-                            <li
-                                {% if day.month != month %}
-                                    class="transaction greyed"
+                            <div
+                                {% if transaction.income != True %}
+                                    class="row no-gutters transaction transaction-red"
                                 {% else %}
-                                    class="transaction"
-                                {% endif %}
-                                data-year="{{ day.year }}"
-                                data-month="{{ day.month }}"
-                                data-day="{{ day.day }}"
-                                data-id="{{ transaction.id }}"
-                                {% if transaction.repeat == True %}
-                                    data-recurrent="1"
+                                    class="row no-gutters transaction transaction-green"
                                 {% endif %}>
+                                <div class="col">
                                 <a href="{{ url_for('edit_transaction', transaction_id = transaction.id) }}">
-                                    {{ transaction.title }} {{ "$%.2f"|format(transaction.amount) }}
+                                    {{ transaction.title }}
                                 </a>
-                            </li>
+                                </div>
+                                <div class="col">
+                                <a href="{{ url_for('edit_transaction', transaction_id = transaction.id) }}">
+                                    {{ "$%.2f"|format(transaction.amount) }}
+                                </a>
+                                </div>
+                            </div>
                             {% set ns.curr_balance = (ns.curr_balance + transaction.amount) if transaction.income == True else (ns.curr_balance - transaction.amount) %}
                         {% endif %}
                     {% endfor %}
-                </ul>
+                </div>
 
             </li>
         {% endfor %}

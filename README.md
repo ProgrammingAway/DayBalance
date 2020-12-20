@@ -1,7 +1,7 @@
 # DayBalance
 This program is a calendar based account balance tracker.  This allows you to
 enter your starting balance and future transactions so you can track your
-future balance.
+future balance in a calendar view.
 
 ## Features
 

@@ -13,7 +13,8 @@ This program is a calendar based account balance tracker.  This allows you to en
  ![](pics/add_transaction.png)
 
  - Modify/Delete Transaction - Clicking on the transaction in the main calendar window gives you the option to modify or delete the transaction
-
+ ![](pics/edit_transaction.png)
+ 
 ## Future Features
 
  - recurring transactions

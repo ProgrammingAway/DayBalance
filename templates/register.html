@@ -39,7 +39,15 @@
                 <input class="form-control" name="start_balance" type="number" step="any" min="0" placeholder="10.00">
             </div>
         </div>
-        <button class="btn btn-primary" type="submit">Register</button>
-        <a href="{{ url_for('index') }}">Cancel</a>
+
+        <div class="form-group row justify-content-center">
+            <div class="col-1">
+                <button class="btn btn-primary" type="submit">Register</button>
+            </div>
+            <div class="col-1">
+                <!--button class="btn btn-cancel" onClick="window.location.href='/';">Cancel</button> -->
+                <a href="{{ url_for('index') }}">Cancel</a>
+            </div>
+        </div>
     </form>
 {% endblock %}

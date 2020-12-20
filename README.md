@@ -25,5 +25,6 @@ future balance.
 
 ### Author
 My name is Brian Ladner and I am a programmer from Dallas, TX.  This is my
-final project for CS50x, the online Intro to Computer Science from Harvard.
+final project for CS50x, the online Intro to Computer Science class from
+Harvard.
 

@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, DateField, SubmitField, TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
+from wtforms import StringField, PasswordField, BooleanField, DecimalField, SubmitField, TextAreaField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, InputRequired
+from wtforms.fields.html5 import DateField
 from app.models import User
 
 
@@ -16,7 +17,7 @@ class RegistrationForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
-    start_date = DateField('Transaction Date', validators=[DataRequired()])
+    start_date = DateField('Transaction Date', validators=[InputRequired()])
     start_balance = DecimalField('Transaction Amount', validators=[DataRequired()], places=2)
     submit = SubmitField('Register')
 
@@ -37,5 +38,4 @@ class TransactionForm(FlaskForm):
     amount = DecimalField('Transaction Amount', validators=[DataRequired()], places=2)
     description = TextAreaField('Description', validators=[Length(min=0, max=140)])
     income = BooleanField('Income')
-
-
+    submit = SubmitField('Submit')

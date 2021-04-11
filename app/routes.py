@@ -1,20 +1,7 @@
-#import os
-
-#from flask import Flask, flash, jsonify, redirect, render_template, request, session
-#from flask_session import Session
-#from flask_sqlalchemy import SQLAlchemy
-#from tempfile import mkdtemp
-#from werkzeug.exceptions import default_exceptions, HTTPException, InternalServerError
-#from werkzeug.security import check_password_hash, generate_password_hash
-#import calendar
-
-#from datetime import date, datetime, timedelta
-
 from datetime import datetime
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.urls import url_parse
-from flask_babel import _, get_locale
 from app import app, db
 from app.forms import LoginForm, RegistrationForm, TransactionForm
 from app.models import User, Transaction
@@ -23,104 +10,59 @@ from app.models import User, Transaction
 @app.route("/add", methods=["GET", "POST"])
 @login_required
 def add_transaction():
-    """ add transaction """
-    # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-
-        year, month, day = map(int, request.form.get("date").split('-'))
-
-        # Create new transaction
-        new_transaction = Transaction(
-            user_id=session["user_id"],
-            title=request.form.get("title"), 
-            date=datetime(year, month, day),
-            amount=request.form.get("amount"),
-            account=(request.form.get("account") if request.form.get("account") else ""),
-            category=(request.form.get("category") if request.form.get("category") else ""),
-            description=(request.form.get("description") if request.form.get("description") else ""),
-            cleared=(True if request.form.get("cleared") == "Cleared" else False),
-            income=(True if request.form.get("income") == "Income" else False),
-            repeat=(True if request.form.get("repeat") == "Repeat" else False),
+    form = TransactionForm()
+    if form.validate_on_submit():
+        transaction = Transaction(
+            user_id=current_user.id,
+            title=form.title.data, 
+            date=form.date.data,
+            amount=form.amount.data,
+            description=form.description.data,
+            income=form.income.data,
         )
-
-        user = User.query.filter_by(id=session["user_id"]).first()
-        user.transactions.append(new_transaction)
-        #db.session.add(new_transaction)
+        db.session.add(transaction)
         db.session.commit()
 
-        # Redirect user to home page
         flash('Transaction Added')
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("transaction.html")
+        return redirect(url_for('index'))
+    return render_template('transaction.html', title='Add Transaction', form=form)
 
 
 @app.route("/edit", methods=["GET", "POST"])
 @app.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
 @login_required
 def edit_transaction(transaction_id):
-    """ edit transaction """
-
+    form = TransactionForm()
     edited_transaction = Transaction.query.filter_by(id=transaction_id).one()
-
-    # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-
-        # Ensure title was submitted
-        if not request.form.get("title"):
-            return apology("must provide transaction title", 403)
-
-        # Ensure date was submitted
-        elif not request.form.get("date"):
-            return apology("must provide transaction date", 403)
-
-        # Ensure amount was submitted
-        elif not request.form.get("amount"):
-            return apology("must provide transaction amount", 403)
-
-        year, month, day = map(int, request.form.get("date").split('-'))
-
-        # Edit transaction
-        edited_transaction.title=request.form.get("title")
-        edited_transaction.date=datetime(year, month, day)
-        edited_transaction.amount=request.form.get("amount")
-        edited_transaction.account=(request.form.get("account") if request.form.get("account") else "")
-        edited_transaction.category=(request.form.get("category") if request.form.get("category") else "")
-        edited_transaction.description=(request.form.get("description") if request.form.get("description") else "")
-        edited_transaction.cleared=(True if request.form.get("cleared") == "Cleared" else False)
-        edited_transaction.income=(True if request.form.get("income") == "Income" else False)
-        edited_transaction.repeat=(True if request.form.get("repeat") == "Repeat" else False)
-
+    if form.validate_on_submit():
+        edited_transaction.title = form.title.data
+        edited_transaction.date = form.date.data
+        edited_transaction.amount = form.amount.data
+        edited_transaction.description = form.description.data
+        edited_transaction.income = form.income.data
         db.session.commit()
-
-        # Redirect user to home page
-        flash('Transaction Modified')
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        date = str(edited_transaction.date.year) + "-" + str(edited_transaction.date.month) + "-" + str(edited_transaction.date.day)
-        return render_template("edit_transaction.html", 
-            transaction=edited_transaction,
-            date=date,
-        )
+        flash('Your changes have been saved.')
+        return redirect(url_for('edit_profile'))
+    elif request.method == 'GET':
+        form.title.data = edited_transaction.title
+        form.date.data = edited_transaction.date
+        form.amount.data = edited_transaction.amount
+        form.description.data= edited_transaction.description
+        form.income.data = edited_transaction.income
+    return render_template('edit_transaction.html', title='Edit Transaction', form=form, transaction_id=edited_transaction.id)
 
 
 #@app.route("/delete", methods=["GET"])
 @app.route("/delete/<int:transaction_id>", methods=["GET"])
 @login_required
 def delete_transaction(transaction_id):
-    """ delete transaction """
-
     delete_transaction = Transaction.query.filter_by(id=transaction_id).one()
     db.session.delete(delete_transaction)
     db.session.commit()
 
     # Redirect user to home page
     flash('Transaction Deleted')
-    return redirect("/")
+    return redirect(url_for('index'))
 
 
 @app.route("/", methods=["GET"])
@@ -183,14 +125,14 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash(_('Invalid username or password'))
+            flash('Invalid username or password')
             return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
             next_page = url_for('index')
         return redirect(next_page)
-    return render_template('login.html', title=_('Sign In'), form=form)
+    return render_template('login.html', title='Sign In', form=form)
 
 
 @app.route('/logout')
@@ -213,10 +155,13 @@ def register():
         )
         user.set_password(form.password.data)
         db.session.add(user)
+        db.session.commit()
+
+        row = User.query.filter_by(username=form.username.data).first()
+
         transaction = Transaction(
             user_id=row.id,
             title="Initial Balance", 
-            #date=datetime(year, month, day),
             date=form.start_date.data,
             amount=form.start_balance.data,
             description="Initial Balance",
@@ -225,6 +170,6 @@ def register():
         db.session.add(transaction)
         db.session.commit()
 
-        flash(_('Congratulations, you are now a registered user!'))
+        flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
-    return render_template('register.html', title=_('Register'), form=form)
+    return render_template('register.html', title='Register', form=form)

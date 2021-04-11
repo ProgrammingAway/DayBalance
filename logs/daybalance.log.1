@@ -1,0 +1,96 @@
+2021-04-11 12:53:59,864 ERROR: Exception on /edit/1 [GET] [in /home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/bladner/Git/DayBalance/app/routes.py", line 52, in edit_transaction
+    return render_template('edit_transaction.html', title=_('Edit Transaction'), form=form)
+NameError: name '_' is not defined
+2021-04-11 12:55:17,870 INFO: DayBalance startup [in /home/bladner/Git/DayBalance/app/__init__.py:31]
+2021-04-11 12:55:34,822 ERROR: Exception on /add [POST] [in /home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/bladner/Git/DayBalance/app/routes.py", line 16, in add_transaction
+    user_id=row.id,
+NameError: name 'row' is not defined
+2021-04-11 12:56:11,686 INFO: DayBalance startup [in /home/bladner/Git/DayBalance/app/__init__.py:31]
+2021-04-11 12:56:20,487 ERROR: Exception on / [GET] [in /home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/bladner/Git/DayBalance/app/routes.py", line 79, in index
+    current_calendar = calendar.Calendar(first_weekday)
+NameError: name 'calendar' is not defined
+2021-04-11 12:56:37,131 ERROR: Exception on /edit/1 [GET] [in /home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py:1891]
+Traceback (most recent call last):
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 2447, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1952, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1821, in handle_user_exception
+    reraise(exc_type, exc_value, tb)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/_compat.py", line 39, in reraise
+    raise value
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1950, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/app.py", line 1936, in dispatch_request
+    return self.view_functions[rule.endpoint](**req.view_args)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask_login/utils.py", line 272, in decorated_view
+    return func(*args, **kwargs)
+  File "/home/bladner/Git/DayBalance/app/routes.py", line 52, in edit_transaction
+    return render_template('edit_transaction.html', title='Edit Transaction', form=form)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/templating.py", line 137, in render_template
+    return _render(
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/templating.py", line 120, in _render
+    rv = template.render(context)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/jinja2/environment.py", line 1090, in render
+    self.environment.handle_exception()
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/jinja2/environment.py", line 832, in handle_exception
+    reraise(*rewrite_traceback_stack(source=source))
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/jinja2/_compat.py", line 28, in reraise
+    raise value.with_traceback(tb)
+  File "/home/bladner/Git/DayBalance/app/templates/edit_transaction.html", line 1, in top-level template code
+    {% extends "layout.html" %}
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/templating.py", line 60, in get_source
+    return self._get_source_fast(environment, template)
+  File "/home/bladner/Git/DayBalance/venv/lib/python3.8/site-packages/flask/templating.py", line 89, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: layout.html
+2021-04-11 12:57:32,647 INFO: DayBalance startup [in /home/bladner/Git/DayBalance/app/__init__.py:31]
+2021-04-11 13:02:55,846 INFO: DayBalance startup [in /home/bladner/Git/DayBalance/app/__init__.py:31]

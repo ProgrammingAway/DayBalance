@@ -10,24 +10,22 @@
 
 #from datetime import date, datetime, timedelta
 
+from datetime import datetime
+from flask import render_template, flash, redirect, url_for, request
+from flask_login import login_user, logout_user, current_user, login_required
+from werkzeug.urls import url_parse
+from flask_babel import _, get_locale
+from app import app, db
+from app.forms import LoginForm, RegistrationForm, TransactionForm
+from app.models import User, Transaction
+
+
 @app.route("/add", methods=["GET", "POST"])
 @login_required
 def add_transaction():
     """ add transaction """
     # User reached route via POST (as by submitting a form via POST)
     if request.method == "POST":
-
-        # Ensure title was submitted
-        if not request.form.get("title"):
-            return apology("must provide transaction title", 403)
-
-        # Ensure date was submitted
-        elif not request.form.get("date"):
-            return apology("must provide transaction date", 403)
-
-        # Ensure amount was submitted
-        elif not request.form.get("amount"):
-            return apology("must provide transaction amount", 403)
 
         year, month, day = map(int, request.form.get("date").split('-'))
 
@@ -177,119 +175,56 @@ def index(year=0, month=0):
         transactions=user.transactions,
     )
 
-@app.route("/login", methods=["GET", "POST"])
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    """Log user in"""
-
-    # Forget any user_id
-    session.clear()
-
-    # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return apology("must provide username", 403)
-
-        # Ensure password was submitted
-        elif not request.form.get("password"):
-            return apology("must provide password", 403)
-
-        # Query database for username
-        row = User.query.filter_by(username=request.form.get("username")).first()
-
-        # Ensure username exists and password is correct
-        if row is None or not check_password_hash(row.hash, request.form.get("password")):
-            return apology("invalid username and/or password", 403)
-
-        # Remember which user has logged in
-        session["user_id"] = row.id
-
-        # Redirect user to home page
-        flash('You were successfully logged in')
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("login.html")
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user is None or not user.check_password(form.password.data):
+            flash(_('Invalid username or password'))
+            return redirect(url_for('login'))
+        login_user(user, remember=form.remember_me.data)
+        next_page = request.args.get('next')
+        if not next_page or url_parse(next_page).netloc != '':
+            next_page = url_for('index')
+        return redirect(next_page)
+    return render_template('login.html', title=_('Sign In'), form=form)
 
 
-@app.route("/logout")
+@app.route('/logout')
 def logout():
-    """Log user out"""
-
-    # Forget any user_id
-    session.clear()
-
-    # Redirect user to login form
-    return redirect("/")
+    logout_user()
+    return redirect(url_for('index'))
 
 
-@app.route("/register", methods=["GET", "POST"])
+@app.route('/register', methods=['GET', 'POST'])
 def register():
-    """Register user"""
-
-    # User reached route via POST (as by submitting a form via POST)
-    if request.method == "POST":
-
-        # Ensure username was submitted
-        if not request.form.get("username"):
-            return apology("must provide username", 403)
-
-        # Ensure password was submitted
-        elif not request.form.get("password"):
-            return apology("must provide password", 403)
-
-        # Ensure password was submitted
-        elif not request.form.get("confirmation"):
-            return apology("must provide password confirmation", 403)
-
-        # Ensure password was submitted
-        elif request.form.get("password") != request.form.get("confirmation"):
-            return apology("password does not match confirmation", 403)
-
-        # Ensure start date was submitted
-        elif not request.form.get("start_date"):
-            return apology("must provide budget start date", 403)
-
-        # Ensure password was submitted
-        elif not request.form.get("start_balance"):
-            return apology("must provide budget start balance", 403)
-
-        # TODO: Check password rules!
-
-        year, month, day = map(int, request.form.get("start_date").split('-'))
-
-        # Query database for username
-        new_user = User(username=request.form.get("username"), 
-            hash=generate_password_hash(request.form.get("password")),
-            start_date=datetime(year, month, day),
-            start_balance=request.form.get("start_balance"))
-        db.session.add(new_user)
-        db.session.commit()
-
-        row = User.query.filter_by(username=request.form.get("username")).first()
-
-        # Create new transaction
-        new_transaction = Transaction(
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(
+            username=form.username.data, 
+            email=form.email.data, 
+            start_date=form.start_date.data, 
+            start_balance=form.start_balance.data
+        )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        transaction = Transaction(
             user_id=row.id,
             title="Initial Balance", 
-            date=datetime(year, month, day),
-            amount=request.form.get("start_balance"),
-            account="",
-            category="",
-            description="",
-            cleared=True,
+            #date=datetime(year, month, day),
+            date=form.start_date.data,
+            amount=form.start_balance.data,
+            description="Initial Balance",
             income=True,
-            repeat=False,
         )
-        db.session.add(new_transaction)
+        db.session.add(transaction)
         db.session.commit()
 
-        # Redirect user to home page
-        flash('Registration successful')
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-        return render_template("register.html")
+        flash(_('Congratulations, you are now a registered user!'))
+        return redirect(url_for('login'))
+    return render_template('register.html', title=_('Register'), form=form)

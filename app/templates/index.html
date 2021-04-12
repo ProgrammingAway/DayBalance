@@ -1,10 +1,7 @@
-{% extends "layout.html" %}
+{% extends "base.html" %}
 
-{% block title %}
-    Calendar
-{% endblock %}
-
-{% block main %}
+{% block app_content %}
+    <h1>{{ 'Calendar' }}</h1>
     {% set ns = namespace(curr_balance=balance) %}
     <div class="row justify-content-center title-row">
         {% if current_month == 1 %}
@@ -91,12 +88,12 @@
                                     class="row no-gutters transaction transaction-green"
                                 {% endif %}>
                                 <div class="col">
-                                <a href="{{ url_for('edit_transaction', transaction_id = transaction.id) }}">
+                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id) }}">
                                     {{ transaction.title }}
                                 </a>
                                 </div>
                                 <div class="col">
-                                <a href="{{ url_for('edit_transaction', transaction_id = transaction.id) }}">
+                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id) }}">
                                     {{ "$%.2f"|format(transaction.amount) }}
                                 </a>
                                 </div>

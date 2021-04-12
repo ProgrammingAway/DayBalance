@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, DecimalField, SubmitField, TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, InputRequired
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, InputRequired
 from wtforms.fields.html5 import DateField
 from app.models import User
 
@@ -32,10 +32,12 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Please use a different email address.')
 
 
-class TransactionForm(FlaskForm):
-    title = StringField('Transaction Name', validators=[DataRequired()])
-    date = DateField('Transaction Date', validators=[DataRequired()])
-    amount = DecimalField('Transaction Amount', validators=[DataRequired()], places=2)
-    description = TextAreaField('Description', validators=[Length(min=0, max=140)])
-    income = BooleanField('Income')
-    submit = SubmitField('Submit')
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')

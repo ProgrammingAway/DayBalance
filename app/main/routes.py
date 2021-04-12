@@ -37,7 +37,7 @@ def index(year=0, month=0):
     month_day1 = list(current_calendar.itermonthdates(year, month))[0]
     prev_transactions = Transaction.query.filter(Transaction.user_id == current_user.id,
         Transaction.date >= current_user.start_date, Transaction.date < month_day1)
-    # find transactions between user.start_date to month_days[0].day/month/year if any
+    # find transactions between current_user.start_date to month_days[0].day/month/year if any
     # for each transaction, add or subtract transaction from start_balance 
 
     month_start_balance = 0

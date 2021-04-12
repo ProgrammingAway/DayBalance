@@ -35,8 +35,11 @@ def index(year=0, month=0):
     month_days = current_calendar.itermonthdates(year, month)
 
     month_day1 = list(current_calendar.itermonthdates(year, month))[0]
-    prev_transactions = Transaction.query.filter(Transaction.user_id == current_user.id,
-        Transaction.date >= current_user.start_date, Transaction.date < month_day1)
+    prev_transactions = Transaction.query.filter(
+        Transaction.user_id == current_user.id,
+        Transaction.date >= current_user.start_date, 
+        Transaction.date < month_day1
+    )
     # find transactions between current_user.start_date to month_days[0].day/month/year if any
     # for each transaction, add or subtract transaction from start_balance 
 
@@ -48,7 +51,8 @@ def index(year=0, month=0):
             month_start_balance = month_start_balance - transaction.amount
 
     # render index.html with current variables
-    return render_template("index.html",
+    return render_template(
+        "index.html",
         todays_date=todays_date,
         current_month=month,
         current_year=year,
@@ -76,9 +80,13 @@ def add_transaction():
         db.session.add(transaction)
         db.session.commit()
 
-        flash('Transaction Added')
-        return redirect(url_for('main.index'))
-    return render_template('transaction.html', title='Add Transaction', form=form)
+        flash("Transaction Added")
+        return redirect(url_for("main.index"))
+    return render_template(
+        "transaction.html", 
+        title="Add Transaction", 
+        form=form,
+    )
 
 
 @bp.route("/edit", methods=["GET", "POST"])
@@ -94,15 +102,20 @@ def edit_transaction(transaction_id):
         edited_transaction.description = form.description.data
         edited_transaction.income = form.income.data
         db.session.commit()
-        flash('Your changes have been saved.')
-        return redirect(url_for('edit_profile'))
+        flash("Your changes have been saved.")
+        return redirect(url_for("edit_profile"))
     elif request.method == 'GET':
         form.title.data = edited_transaction.title
         form.date.data = edited_transaction.date
         form.amount.data = edited_transaction.amount
         form.description.data= edited_transaction.description
         form.income.data = edited_transaction.income
-    return render_template('edit_transaction.html', title='Edit Transaction', form=form, transaction_id=edited_transaction.id)
+    return render_template(
+        "edit_transaction.html", 
+        title="Edit Transaction", 
+        form=form, 
+        transaction_id=edited_transaction.id,
+    )
 
 
 #@bp.route("/delete", methods=["GET"])
@@ -114,5 +127,5 @@ def delete_transaction(transaction_id):
     db.session.commit()
 
     # Redirect user to home page
-    flash('Transaction Deleted')
-    return redirect(url_for('main.index'))
+    flash("Transaction Deleted")
+    return redirect(url_for("main.index"))

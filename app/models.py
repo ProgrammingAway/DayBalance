@@ -13,7 +13,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     start_date = db.Column(db.DateTime, nullable=False)
     start_balance = db.Column(db.Float, nullable=False)
-    transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
+    transactions = db.relationship('Transaction', backref='user',
+        lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)

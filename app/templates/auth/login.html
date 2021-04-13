@@ -21,5 +21,11 @@
         <div class="form-group row justify-content-center">
             {{ form.submit(class="col-1") }}
         </div>
+
+        {% for field, errors in form.errors.items() %}
+            <div class="alert alert-primary border text-center" role="alert">
+                {{ form[field].label }}: {{ ', '.join(errors) }}
+            </div>
+        {% endfor %}
     </form>
 {% endblock %}

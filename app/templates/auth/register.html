@@ -36,5 +36,11 @@
                 <a href="{{ url_for('main.index') }}">Cancel</a>
             </div>
         </div>
+
+        {% for field, errors in form.errors.items() %}
+            <div class="alert alert-primary border text-center" role="alert">
+                {{ form[field].label }}: {{ ', '.join(errors) }}
+            </div>
+        {% endfor %}
     </form>
 {% endblock %}

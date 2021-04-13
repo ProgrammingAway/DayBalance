@@ -12,8 +12,8 @@ from app.auth.email import send_password_reset_email
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    form = LoginForm()
-    if form.validate_on_submit():
+    form = LoginForm(request.form)
+    if request.method == 'POST' and form.validate():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
@@ -36,8 +36,8 @@ def logout():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    form = RegistrationForm()
-    if form.validate_on_submit():
+    form = RegistrationForm(request.form)
+    if request.method == 'POST' and form.validate():
         user = User(
             username=form.username.data, 
             email=form.email.data, 
@@ -69,8 +69,8 @@ def register():
 def reset_password_request():
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
-    form = ResetPasswordRequestForm()
-    if form.validate_on_submit():
+    form = ResetPasswordRequestForm(request.form)
+    if request.method == 'POST' and form.validate():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             send_password_reset_email(user)
@@ -86,8 +86,8 @@ def reset_password(token):
     user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('main.index'))
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
+    form = ResetPasswordForm(request.form)
+    if request.method == 'POST' and form.validate():
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.')

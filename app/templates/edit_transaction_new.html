@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>{{ 'Edit Transaction' }}</h1>
+    <div class="row">
+        <div class="col-md-4">
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+
+    <div class="col-1">
+        <!-- <button class="btn btn-cancel" onClick="window.location.href='/';">Cancel</button> -->
+        <a href="{{ url_for('main.index') }}">Cancel</a>
+    </div>
+    <div class="col-1">
+        <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}';">Delete</button> -->
+        <a href="{{ url_for('main.delete_transaction',transaction_id = transaction_id) }}">Delete</a>
+    </div>
+
+{% endblock %}

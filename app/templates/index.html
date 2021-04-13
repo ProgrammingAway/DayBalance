@@ -1,7 +1,10 @@
-{% extends "base.html" %}
+{% extends "layout.html" %}
 
-{% block app_content %}
-    <h1>{{ 'Calendar' }}</h1>
+{% block title %}
+    Calendar
+{% endblock %}
+
+{% block main %}
     {% set ns = namespace(curr_balance=balance) %}
     <div class="row justify-content-center title-row">
         {% if current_month == 1 %}

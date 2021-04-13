@@ -1,17 +1,25 @@
-{% extends 'base.html' %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layout.html" %}
 
-{% block app_content %}
-    <h1>{{ _('Sign In') }}</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+{% block title %}
+    Log In
+{% endblock %}
+
+{% block main %}
+    <form action="login" method="POST">
+        <div class="form-group">
+            {{ form.username.label(class="col-sm-2 col-form-label") }}
+            {{ form.username(class="col-sm-2") }}
         </div>
-    </div>
-    <br>
-    <p>{{ _('New User?') }} <a href="{{ url_for('auth.register') }}">{{ _('Click to Register!') }}</a></p>
-    <p>
-        {{ _('Forgot Your Password?') }}
-        <a href="{{ url_for('auth.reset_password_request') }}">{{ _('Click to Reset It') }}</a>
-    </p>
+        <div class="form-group">
+            {{ form.password.label(class="col-sm-2 col-form-label") }}
+            {{ form.password(class="col-sm-2") }}
+        </div>
+        <div class="form-group">
+            {{ form.remember_me.label(class="col-sm-2 col-form-label") }}
+            {{ form.remember_me(class="col-sm-2") }}
+        </div>
+        <div class="form-group row justify-content-center">
+            {{ form.submit(class="col-1") }}
+        </div>
+    </form>
 {% endblock %}

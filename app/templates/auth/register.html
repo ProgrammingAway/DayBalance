@@ -1,11 +1,40 @@
-{% extends "base.html" %}
-{% import 'bootstrap/wtf.html' as wtf %}
+{% extends "layout.html" %}
 
-{% block app_content %}
-    <h1>{{ _('Register') }}</h1>
-    <div class="row">
-        <div class="col-md-4">
-            {{ wtf.quick_form(form) }}
+{% block title %}
+    Register
+{% endblock %}
+
+{% block main %}
+    <form action="/register" method="POST">
+        <div class="form-group">
+            {{ form.username.label(class="col-sm-2 col-form-label") }}
+            {{ form.username(class="col-sm-2") }}
         </div>
-    </div>
+        <div class="form-group">
+            {{ form.email.label(class="col-sm-2 col-form-label") }}
+            {{ form.email(class="col-sm-2") }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class="col-sm-2 col-form-label") }}
+            {{ form.password(class="col-sm-2") }}
+        </div>
+        <div class="form-group">
+            {{ form.password2.label(class="col-sm-2 col-form-label") }}
+            {{ form.password2(class="col-sm-2") }}
+        </div>
+        <div class="form-group">
+            {{ form.start_date.label(class="col-sm-2 col-form-label") }}
+            {{ form.start_date(class="col-sm-2") }}
+        </div>
+        <div class="form-group">
+            {{ form.start_balance.label(class="col-sm-2 col-form-label") }}
+            {{ form.start_balance(class="col-sm-2") }}
+        </div>
+        <div class="form-group row justify-content-center">
+            {{ form.submit(class="col-1") }}
+            <div class="col-1">
+                <a href="{{ url_for('main.index') }}">Cancel</a>
+            </div>
+        </div>
+    </form>
 {% endblock %}

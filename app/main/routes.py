@@ -67,8 +67,8 @@ def index(year=0, month=0):
 @bp.route("/add", methods=["GET", "POST"])
 @login_required
 def add_transaction():
-    form = TransactionForm()
-    if form.validate_on_submit():
+    form = TransactionForm(request.form)
+    if request.method == 'POST' and form.validate():
         transaction = Transaction(
             user_id=current_user.id,
             title=form.title.data, 
@@ -93,9 +93,9 @@ def add_transaction():
 @bp.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
 @login_required
 def edit_transaction(transaction_id):
-    form = TransactionForm()
+    form = TransactionForm(request.form)
     edited_transaction = Transaction.query.filter_by(id=transaction_id).one()
-    if form.validate_on_submit():
+    if request.method == 'POST' and form.validate():
         edited_transaction.title = form.title.data
         edited_transaction.date = form.date.data
         edited_transaction.amount = form.amount.data
@@ -103,7 +103,7 @@ def edit_transaction(transaction_id):
         edited_transaction.income = form.income.data
         db.session.commit()
         flash("Your changes have been saved.")
-        return redirect(url_for("edit_profile"))
+        return redirect(url_for("main.index"))
     elif request.method == 'GET':
         form.title.data = edited_transaction.title
         form.date.data = edited_transaction.date

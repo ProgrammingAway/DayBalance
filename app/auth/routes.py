@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user
 from app import db
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
-from app.models import User
+from app.models import User, Transaction
 from app.auth.email import send_password_reset_email
 
 
@@ -42,7 +42,7 @@ def register():
             username=form.username.data, 
             email=form.email.data, 
             start_date=form.start_date.data, 
-            start_balance=form.start_balance.data
+            start_balance=form.start_balance.data,
         )
         user.set_password(form.password.data)
         db.session.add(user)
@@ -62,6 +62,7 @@ def register():
         db.session.commit()
 
         flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('auth.login'))
     return render_template('auth/register.html', title='Register', form=form)
 
 

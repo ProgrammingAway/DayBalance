@@ -3,6 +3,7 @@ from flask_login import current_user
 import calendar
 import datetime
 import dateutil
+from app.models import Transaction
 
 class BalanceCalendar(calendar.Calendar):
 

@@ -36,3 +36,17 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
+
+class RepeatedTransaction(Transaction):
+    freq = 1
+    interval = 1
+    wkst = None
+    count = None
+    until = None
+    bysetpos = None
+    bymonth = None
+    bymonthday = None
+    byyearday = None
+    byweekno = None
+    byweekday = None
+    cache = False

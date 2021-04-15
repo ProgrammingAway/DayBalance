@@ -86,8 +86,8 @@ class Transaction(db.Model):
     date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
-    income = db.Column(db.Boolean)
-#    is_recurring = db.Column(db.Boolean)
+    income = db.Column(db.Boolean, default=False)
+#    is_recurring = db.Column(db.Boolean, default=False)
 #    freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
 #    interval = db.Column(db.Integer)  # interval betweek frequency
 #    wkst = db.Column(db.Integer)  # MO, TU, WE or int  # affects WEEKLY frequency
@@ -98,6 +98,10 @@ class Transaction(db.Model):
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
+
+#    def add_recurrence():
+#        self.is_recurring = True
+#        pass
     
 #    def return_transactions_between(self, start=self.date, end)
 #        dates = rruleset()

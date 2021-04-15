@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from calendar import day_abbr, month_name
 from app import db, login, balance_calendar
-import calendar
 
 
 @login.user_loader
@@ -29,11 +29,11 @@ class User(UserMixin, db.Model):
     def weekday_headers(self):
         weekday_headers = []
         for weekday in balance_calendar.iterweekdays():
-            weekday_headers.append(calendar.day_abbr[weekday])
+            weekday_headers.append(day_abbr[weekday])
         return weekday_headers
     
     def month_name(self, month):
-        return calendar.month_name[month]
+        return month_name[month]
 
     def month_days(self, year, month):
         return balance_calendar.itermonthdates(year, month)

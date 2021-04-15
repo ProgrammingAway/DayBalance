@@ -27,9 +27,9 @@ def create_app(config_class=Config):
     mail.init_app(app)
 
     if app.config['START_MONDAY']:
-        balance_calendar.__init__(0)  # 0 = Monday, 6 = Sunday
+        balance_calendar.setfirstweekday(0)  # 0 = Monday, 6 = Sunday
     else:
-        balance_calendar.__init__(6)
+        balance_calendar.setfirstweekday(6)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)

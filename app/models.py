@@ -88,14 +88,11 @@ class Transaction(db.Model):
     description = db.Column(db.String(200))
     income = db.Column(db.Boolean)
     #is_recurring = db.Column(db.Boolean)
-    #recurring_pattern = db.Column(db.String(100))  # Store pattern variables separately
     #freq = DAILY, WEEKLY, MONTHLY, YEARLY
     #interval = db.Column(db.Integer)  # interval betweek frequency
     #wkst = Mo, TU, WE or int  # affects WEEKLY frequency
     #count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
     #until = db.Column(db.Date, nullable=False)  # recurrence end date (Cannot be used with count)
-    #bysetpos
-    #byweekday
     #transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 

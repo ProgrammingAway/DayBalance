@@ -87,20 +87,38 @@ class Transaction(db.Model):
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
     income = db.Column(db.Boolean)
-    #is_recurring = db.Column(db.Boolean)
-    #freq = DAILY, WEEKLY, MONTHLY, YEARLY
-    #interval = db.Column(db.Integer)  # interval betweek frequency
-    #wkst = Mo, TU, WE or int  # affects WEEKLY frequency
-    #count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
-    #until = db.Column(db.Date, nullable=False)  # recurrence end date (Cannot be used with count)
-    #transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
+#    is_recurring = db.Column(db.Boolean)
+#    freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
+#    interval = db.Column(db.Integer)  # interval betweek frequency
+#    wkst = db.Column(db.Integer)  # MO, TU, WE or int  # affects WEEKLY frequency
+#    count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
+#    until = db.Column(db.Date, nullable=False)  # recurrence end date (Cannot be used with count)
+#    transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
+    
+#    def return_transactions_between(self, start=self.date, end)
+#        dates = rruleset()
+#        dates.rrule(rrule(freq=self.freq, dtstart=self.date, interval=self.interval, wkst=self.wkst, count=self.count, until=self.until))
+#        
+#        exceptions = TransactionException.query.filter(
+#            TransactionException.user_id == self.id,
+#            TransactionException.date >= start, 
+#            TransactionException.date <= end,
+#        )
+#        
+#        for exception in exceptions:
+#            if exception.delete:
+#                dates.exdate(exception.date)
+#            else:
+#                dates.rdate(exception.date)
+#
+#        return dates.between(before=start, after=end, inc=True)
 
 #class TransactionException(db.Model):
 #    id = db.Column(db.Integer, primary_key=True)
 #    date = db.Column(db.DateTime, nullable=False)
+#    delete = db.Column(db.Boolean)
 #    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
-

@@ -83,25 +83,27 @@ class User(UserMixin, db.Model):
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     amount = db.Column(db.Float, nullable=False)
     description = db.Column(db.String(200))
     income = db.Column(db.Boolean)
+    #is_recurring = db.Column(db.Boolean)
+    #recurring_pattern = db.Column(db.String(100))  # Store pattern variables separately
+    #freq = DAILY, WEEKLY, MONTHLY, YEARLY
+    #interval = db.Column(db.Integer)  # interval betweek frequency
+    #wkst = Mo, TU, WE or int  # affects WEEKLY frequency
+    #count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
+    #until = db.Column(db.Date, nullable=False)  # recurrence end date (Cannot be used with count)
+    #bysetpos
+    #byweekday
+    #transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
 
-# class RepeatedTransaction(Transaction):
-#     freq = 1
-#     interval = 1
-#     wkst = None
-#     count = None
-#     until = None
-#     bysetpos = None
-#     bymonth = None
-#     bymonthday = None
-#     byyearday = None
-#     byweekno = None
-#     byweekday = None
-#     cache = False
+#class TransactionException(db.Model):
+#    id = db.Column(db.Integer, primary_key=True)
+#    date = db.Column(db.DateTime, nullable=False)
+#    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)
+

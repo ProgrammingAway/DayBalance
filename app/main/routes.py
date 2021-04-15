@@ -52,6 +52,8 @@ def add_transaction():
             description=form.description.data,
             income=form.income.data,
         )
+        #if form.is_recurring.data:
+        #    transaction.add_recurrence()
         db.session.add(transaction)
         db.session.commit()
 

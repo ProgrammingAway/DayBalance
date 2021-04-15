@@ -7,6 +7,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_mail import Mail
 from config import Config
+from calendar import Calendar
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -14,6 +15,7 @@ login = LoginManager()
 login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
 mail = Mail()
+balance_calendar = Calendar()
 
 def create_app(config_class=Config):
     app = Flask(__name__)
@@ -23,6 +25,11 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     login.init_app(app)
     mail.init_app(app)
+
+    if app.config['START_MONDAY']:
+        balance_calendar.__init__(0)  # 0 = Monday, 6 = Sunday
+    else:
+        balance_calendar.__init__(6)
 
     from app.errors import bp as errors_bp
     app.register_blueprint(errors_bp)

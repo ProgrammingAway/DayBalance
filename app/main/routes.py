@@ -5,7 +5,6 @@ from app import db
 from app.main.forms import TransactionForm
 from app.models import User, Transaction
 from app.main import bp
-import calendar
 
 
 @bp.route("/", methods=["GET"])
@@ -14,42 +13,17 @@ import calendar
 def index(year=0, month=0):
     """Show current balance calendar"""
 
-    first_weekday = 6 # 0 = Monday, 6 = Sunday
-
-    # create calendar based on first weekday
-    current_calendar = calendar.Calendar(first_weekday)
-
-    # create weekday headers based on first weekday
-    weekdays_headers = []
-    for weekday in current_calendar.iterweekdays():
-        weekdays_headers.append(calendar.day_abbr[weekday])
-
     # set year and month to todays date if not supplied
     todays_date = datetime.date(datetime.now())
     if year == 0 or month == 0:
         year = todays_date.year
         month = todays_date.month
 
-    # retrieve current month name and days for current month
-    current_months_name = calendar.month_name[month]
-    month_days = current_calendar.itermonthdates(year, month)
-
-    month_day1 = list(current_calendar.itermonthdates(year, month))[0]
-    prev_transactions = Transaction.query.filter(
-        Transaction.user_id == current_user.id,
-        Transaction.date >= current_user.start_date, 
-        Transaction.date < month_day1
-    )
-    # find transactions between current_user.start_date to 
-    # month_days[0].day/month/year if any
-    # for each transaction, add or subtract transaction from start_balance
-
-    month_start_balance = 0
-    for transaction in prev_transactions:
-        if transaction.income == True:
-            month_start_balance = month_start_balance + transaction.amount
-        else:
-            month_start_balance = month_start_balance - transaction.amount
+    month_name = current_user.month_name(month)
+    weekday_headers = current_user.weekday_headers()
+    start_balance = current_user.month_starting_balance(year, month)
+    month_days = current_user.month_days(year, month)
+    month_transactions = current_user.month_transactions(year, month)
 
     # render index.html with current variables
     return render_template(
@@ -57,11 +31,11 @@ def index(year=0, month=0):
         todays_date=todays_date,
         current_month=month,
         current_year=year,
-        current_months_name=current_months_name,
-        weekdays_headers=weekdays_headers,
+        current_months_name=month_name,
+        weekday_headers=weekday_headers,
         month_days=month_days,
-        balance=month_start_balance,
-        transactions=current_user.transactions,
+        balance=start_balance,
+        transactions=month_transactions,
     )
 
 

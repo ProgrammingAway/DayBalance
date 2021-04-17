@@ -1,8 +1,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 from flask_login import UserMixin
 from calendar import day_abbr, month_name
+from time import time
 from datetime import datetime
 from dateutil.rrule import rrule, rruleset, YEARLY, MONTHLY, WEEKLY, DAILY
+import jwt
 from app import db, login, balance_calendar
 
 

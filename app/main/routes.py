@@ -45,15 +45,20 @@ def add_transaction():
     form = TransactionForm(request.form)
     if request.method == 'POST' and form.validate():
         transaction = Transaction(
-            user_id=current_user.id,
-            title=form.title.data, 
-            date=form.date.data,
-            amount=form.amount.data,
-            description=form.description.data,
-            income=form.income.data,
+            user_id = current_user.id,
+            title = form.title.data, 
+            date = form.date.data,
+            amount = form.amount.data,
+            description = form.description.data,
+            income = form.income.data,
+            is_recurring = form.is_recurring.data,
+            freq = form.freq.data,
+            interval = form.interval.data,
+            count = form.count.data,
+            until = form.until.data,
         )
-        #if form.is_recurring.data:
-        #    transaction.add_recurrence()
+        if form.is_recurring.data:
+            transaction.add_recurrence(form.byweekday.data)
         db.session.add(transaction)
         db.session.commit()
 
@@ -61,8 +66,8 @@ def add_transaction():
         return redirect(url_for("main.index"))
     return render_template(
         "transaction.html", 
-        title="Add Transaction", 
-        form=form,
+        title = "Add Transaction", 
+        form = form,
     )
 
 
@@ -78,6 +83,13 @@ def edit_transaction(transaction_id):
         edited_transaction.amount = form.amount.data
         edited_transaction.description = form.description.data
         edited_transaction.income = form.income.data
+        edited_transaction.is_recurring = form.is_recurring.data
+        edited_transaction.freq = form.freq.data
+        edited_transaction.interval = form.interval.data
+        edited_transaction.count = form.count.data
+        edited_transaction.until = form.until.data
+        if form.is_recurring.data:
+            edited_transaction.set_byweekday(form.byweekday.data)
         db.session.commit()
         flash("Your changes have been saved.")
         return redirect(url_for("main.index"))
@@ -87,11 +99,18 @@ def edit_transaction(transaction_id):
         form.amount.data = edited_transaction.amount
         form.description.data= edited_transaction.description
         form.income.data = edited_transaction.income
+        form.is_recurring.data = edited_transaction.is_recurring
+        form.freq.data = edited_transaction.freq
+        form.interval.data = edited_transaction.interval
+        form.count.data = edited_transaction.count
+        form.until.data = edited_transaction.until
+        if edited_transaction.is_recurring:
+            form.byweekday.data = edited_transaction.return_byweekday()
     return render_template(
         "edit_transaction.html", 
-        title="Edit Transaction", 
-        form=form, 
-        transaction_id=edited_transaction.id,
+        title = "Edit Transaction", 
+        form = form, 
+        transaction_id = edited_transaction.id,
     )
 
 

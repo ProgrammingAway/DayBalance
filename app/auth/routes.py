@@ -58,6 +58,7 @@ def register():
             amount=form.start_balance.data,
             description="Initial Balance",
             income=True,
+            is_recurring=False,
         )
         db.session.add(transaction)
         db.session.commit()

@@ -55,7 +55,7 @@ class UserModelCase(unittest.TestCase):
         token_fail = token_pass[1:] + token_pass[0]
         new_u_fail = User.verify_reset_password_token(token_fail)
         self.assertNotEqual(u, new_u_fail)
-        self.createTestUser(username='oreo', password='password2')
+        self.createTestUser(username='oreo', password='password2', email='oreo@email.com')
         u2 = User.query.filter_by(username='oreo').first()
         token_fail2 = u2.get_reset_password_token()
         new_u_fail2 = User.verify_reset_password_token(token_fail2)

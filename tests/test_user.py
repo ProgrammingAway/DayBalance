@@ -33,6 +33,7 @@ class UserModelCase(unittest.TestCase):
         u.start_balance = start_balance
         db.session.add(u)
         db.session.commit()
+        return User.query.filter_by(username=username).first()
 
     def tearDown(self):
         db.session.remove()
@@ -40,30 +41,26 @@ class UserModelCase(unittest.TestCase):
         self.app_context.pop()
 
     def test_password_hashing(self):
-        self.createTestUser(username='panda', password='password')
-        u = User.query.filter_by(username='panda').first()
+        u = self.createTestUser(username='panda', password='password')
         self.assertFalse(u.check_password('other_password'))
         self.assertTrue(u.check_password('password'))
 
     def test_token(self):
-        self.createTestUser(username='panda')
-        u = User.query.filter_by(username='panda').first()
+        u = self.createTestUser(username='panda')
         token_pass = u.get_reset_password_token()
         new_u_pass = User.verify_reset_password_token(token_pass)
-        self.assertEqual(u, new_u_pass)
+        self.assertEqual(u, new_u_pass) # Test Passes
         # Move first character to the back to change the token
         token_fail = token_pass[1:] + token_pass[0]
         new_u_fail = User.verify_reset_password_token(token_fail)
-        self.assertNotEqual(u, new_u_fail)
-        self.createTestUser(username='oreo', password='password2', email='oreo@email.com')
-        u2 = User.query.filter_by(username='oreo').first()
+        self.assertNotEqual(u, new_u_fail) # Test fails to no matching user
+        u2 = self.createTestUser(username='oreo', password='password2', email='oreo@email.com')
         token_fail2 = u2.get_reset_password_token()
         new_u_fail2 = User.verify_reset_password_token(token_fail2)
-        self.assertNotEqual(u, new_u_fail2)
+        self.assertNotEqual(u, new_u_fail2) # Test fails to different user
 
     def test_month_name(self):
-        self.createTestUser(username='panda')
-        u = User.query.filter_by(username='panda').first()
+        u = self.createTestUser(username='panda')
         months = { 1:"January", 2:"February", 3:"March", 4:"April", 5:"May",
             6:"June", 7:"July", 8:"August", 9:"September", 10:"October",
             11:"November", 12:"December"}
@@ -71,8 +68,8 @@ class UserModelCase(unittest.TestCase):
             self.assertEqual(name, u.month_name(num))
 
     def test_month_day(self):
-        self.createTestUser(username='panda')
-        u = User.query.filter_by(username='panda').first()
+        u = self.createTestUser(username='panda')
+        #u = User.query.filter_by(username='panda').first()
         dates = u.month_days(2020, 2)
         day2_29 = date(2020, 2, 29)
         day3_1 = date(2020, 3, 1)
@@ -80,8 +77,11 @@ class UserModelCase(unittest.TestCase):
         self.assertFalse(day3_1 in dates)
 
     def test_month_starting_balance(self):
-        self.createTestUser(username='panda')
-        u = User.query.filter_by(username='panda').first()
+        u = self.createTestUser(username='panda')
+        pass
+
+    def test_month_transactions(self):
+        u = self.createTestUser(username='panda')
         pass
 
 if __name__ == '__main__':

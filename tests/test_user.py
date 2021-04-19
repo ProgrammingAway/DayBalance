@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime, timedelta, date
+from decimal import Decimal
 import unittest
 from app import create_app, db
 from app.models import User, Transaction

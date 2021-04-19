@@ -91,9 +91,10 @@ class UserModelCase(unittest.TestCase):
 
     def test_month_starting_balance(self):
         u = self.createTestUser(username='panda')
-        t1 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='100', income=False)
-        t2 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='30.22', income=False)
-        t3 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='20', income=True)
+        t1 = self.createTestTransaction(user_id=u.id, date=date(2021,6,5), amount='100', income=False)
+        t2 = self.createTestTransaction(user_id=u.id, date=date(2021,6,12), amount='30.22', income=False)
+        t3 = self.createTestTransaction(user_id=u.id, date=date(2021,6,22), amount='20', income=True)
+        t4 = self.createTestTransaction(user_id=u.id, date=date(2021,7,1), amount='12.36', income=False)
         pass
 
     def test_month_transactions(self):

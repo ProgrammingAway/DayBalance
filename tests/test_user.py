@@ -44,7 +44,7 @@ class UserModelCase(unittest.TestCase):
         income=False,
         is_recurring=False,
     ):
-        t = Transaction(title=title, date=date, amount=amount, income=income, is_recurring=is_recurring)
+        t = Transaction(user_id=user_id, title=title, date=date, amount=amount, income=income, is_recurring=is_recurring)
         db.session.add(t)
         db.session.commit()
         return Transaction.query.filter_by(id=t.id).first()

@@ -65,8 +65,8 @@ def add_transaction():
         flash("Transaction Added")
         return redirect(url_for("main.index"))
     return render_template(
-        "transaction.html", 
-        title = "Add Transaction", 
+        "transaction.html",
+        title = "Add Transaction",
         form = form,
     )
 

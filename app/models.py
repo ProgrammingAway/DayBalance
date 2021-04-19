@@ -35,7 +35,8 @@ class User(UserMixin, db.Model):
         return jwt.encode(
             {'reset_password': self.id, 'exp': time() + expires_in},
             current_app.config['SECRET_KEY'],
-            algorithm='HS256').decode('utf-8')
+            algorithm='HS256')
+#            algorithm='HS256').decode('utf-8')
 
     @staticmethod
     def verify_reset_password_token(token):
@@ -64,7 +65,7 @@ class User(UserMixin, db.Model):
 
         prev_transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
-            Transaction.date >= self.start_date, 
+            Transaction.date >= self.start_date,
             Transaction.date < month_start_day
         )
 

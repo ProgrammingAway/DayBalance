@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from datetime import datetime, timedelta, date
+import decimal
 import unittest
 from app import create_app, db
 from app.models import User, Transaction
@@ -95,12 +96,22 @@ class UserModelCase(unittest.TestCase):
         t2 = self.createTestTransaction(user_id=u.id, date=date(2021,6,12), amount='30.22', income=False)
         t3 = self.createTestTransaction(user_id=u.id, date=date(2021,6,22), amount='20', income=True)
         t4 = self.createTestTransaction(user_id=u.id, date=date(2021,7,4), amount='12.36', income=False)
-        # 500+(-100-30.22+20)=389.78 For June calendar
-        july_start_balance = u.start_balance + float(u.month_starting_balance(2021, 7))
-        self.assertEqual(389.78, july_start_balance)
-        # 389.78+(-12.36)=377.42 For July calendar
-        august_start_balance = u.start_balance + float(u.month_starting_balance(2021, 8))
-        self.assertEqual(377.42, august_start_balance)
+
+        july_start_balance = 0
+        for transaction in [t1, t2, t3]:
+            if transaction.income:
+                july_start_balance = july_start_balance + transaction.amount
+            else:
+                july_start_balance = july_start_balance - transaction.amount
+        self.assertEqual(july_start_balance, u.month_starting_balance(2021, 7))
+
+        august_start_balance = july_start_balance
+        for transaction in [t4]:
+            if transaction.income:
+                august_start_balance = august_start_balance + transaction.amount
+            else:
+                august_start_balance = august_start_balance - transaction.amount
+        self.assertEqual(august_start_balance, u.month_starting_balance(2021, 8))
 
     def test_month_transactions(self):
         u = self.createTestUser(username='panda')

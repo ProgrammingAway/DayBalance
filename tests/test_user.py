@@ -33,7 +33,21 @@ class UserModelCase(unittest.TestCase):
         u.start_balance = start_balance
         db.session.add(u)
         db.session.commit()
-        return User.query.filter_by(username=username).first()
+        return User.query.filter_by(id=u.id).first()
+
+    def createTestTransaction(
+        self,
+        user_id,
+        title='Test Transaction',
+        date=datetime.now(),
+        amount=100.00,
+        income=False,
+        is_recurring=False,
+    ):
+        t = Transaction(title=title, date=date, amount=amount, income=income, is_recurring=is_recurring)
+        db.session.add(t)
+        db.session.commit()
+        return Transaction.query.filter_by(id=t.id).first()
 
     def tearDown(self):
         db.session.remove()
@@ -69,7 +83,6 @@ class UserModelCase(unittest.TestCase):
 
     def test_month_day(self):
         u = self.createTestUser(username='panda')
-        #u = User.query.filter_by(username='panda').first()
         dates = u.month_days(2020, 2)
         day2_29 = date(2020, 2, 29)
         day3_1 = date(2020, 3, 1)
@@ -78,6 +91,9 @@ class UserModelCase(unittest.TestCase):
 
     def test_month_starting_balance(self):
         u = self.createTestUser(username='panda')
+        t1 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='100', income=False)
+        t2 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='30.22', income=False)
+        t3 = self.createTestTransaction(user_id=u.id, title='test 1', date=datetime.date(2021,6,5), amount='20', income=True)
         pass
 
     def test_month_transactions(self):

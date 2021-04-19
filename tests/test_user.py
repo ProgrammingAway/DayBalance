@@ -96,9 +96,9 @@ class UserModelCase(unittest.TestCase):
         t3 = self.createTestTransaction(user_id=u.id, date=date(2021,6,22), amount='20', income=True)
         t4 = self.createTestTransaction(user_id=u.id, date=date(2021,7,4), amount='12.36', income=False)
         # -100-30.22+20=-110.22 For June calendar
-        self.assertEqual(-110.22, u.month_starting_balance(2021, 7))
+        self.assertEqual(-110.22, u.month_starting_balance(2021, 7).quantize(Decimal('1.00')))
         # -110.22-12.36=-122.58 For July calendar
-        self.assertEqual(-122.58, u.month_starting_balance(2021, 8))
+        self.assertEqual(-122.58, u.month_starting_balance(2021, 8).quantize(Decimal('1.00')))
 
     def test_month_transactions(self):
         u = self.createTestUser(username='panda')

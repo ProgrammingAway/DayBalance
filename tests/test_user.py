@@ -29,7 +29,7 @@ class UserModelCase(unittest.TestCase):
         u = User(username=username)
         u.set_password(password)
         u.email = email
-        u.start_date = start_time
+        u.start_date = start_date
         u.start_balance = start_balance
         db.session.add(u)
         db.session.commit()
@@ -52,7 +52,7 @@ class UserModelCase(unittest.TestCase):
         new_u_pass = User.verify_reset_password_token(token_pass)
         self.assertEqual(u, new_u_pass)
         # Move first character to the back to change the token
-        token_fail = token[1:] + token[0]
+        token_fail = token_pass[1:] + token_pass[0]
         new_u_fail = User.verify_reset_password_token(token_fail)
         self.assertNotEqual(u, new_u_fail)
         self.createTestUser(username='oreo', password='password2')

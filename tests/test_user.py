@@ -11,6 +11,7 @@ class TestConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = 'sqlite://'
     SECRET_KEY = 'testing'
+    START_MONDAY = True
 
 class UserModelCase(unittest.TestCase):
     def setUp(self):
@@ -74,6 +75,14 @@ class UserModelCase(unittest.TestCase):
         new_u_fail2 = User.verify_reset_password_token(token_fail2)
         self.assertNotEqual(u, new_u_fail2) # Test fails to different user
 
+    def test_weekday_headers(self):
+        u = self.createTestUser(username='panda')
+        if self.app.config['START_MONDAY']:
+            weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        else:
+            weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        self.assertEqual(weekdays, u.weekday_headers())
+
     def test_month_name(self):
         u = self.createTestUser(username='panda')
         months = { 1:"January", 2:"February", 3:"March", 4:"April", 5:"May",
@@ -86,9 +95,9 @@ class UserModelCase(unittest.TestCase):
         u = self.createTestUser(username='panda')
         dates = u.month_days(2020, 2)
         day2_29 = date(2020, 2, 29)
-        day3_1 = date(2020, 3, 1)
+        day3_15 = date(2020, 3, 15)
         self.assertTrue(day2_29 in dates)
-        self.assertFalse(day3_1 in dates)
+        self.assertFalse(day3_15 in dates)
 
     def test_month_starting_balance(self):
         u = self.createTestUser(username='panda', start_date=date(2021,1,1), start_balance=500.00)

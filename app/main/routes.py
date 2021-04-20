@@ -48,7 +48,6 @@ def add_transaction():
             user_id = current_user.id,
             title = form.title.data, 
             date = form.date.data,
-            amount = form.amount.data,
             description = form.description.data,
             income = form.income.data,
             is_recurring = form.is_recurring.data,
@@ -57,8 +56,9 @@ def add_transaction():
             count = form.count.data,
             until = form.until.data,
         )
+        transaction.set_amount(form.amount.data)
         if form.is_recurring.data:
-            transaction.add_recurrence(form.byweekday.data)
+            transaction.set_byweekday(form.byweekday.data)
         db.session.add(transaction)
         db.session.commit()
 
@@ -80,7 +80,6 @@ def edit_transaction(transaction_id):
     if request.method == 'POST' and form.validate():
         edited_transaction.title = form.title.data
         edited_transaction.date = form.date.data
-        edited_transaction.amount = form.amount.data
         edited_transaction.description = form.description.data
         edited_transaction.income = form.income.data
         edited_transaction.is_recurring = form.is_recurring.data
@@ -88,6 +87,7 @@ def edit_transaction(transaction_id):
         edited_transaction.interval = form.interval.data
         edited_transaction.count = form.count.data
         edited_transaction.until = form.until.data
+        edited_transaction.set_amount(form.amount.data)
         if form.is_recurring.data:
             edited_transaction.set_byweekday(form.byweekday.data)
         db.session.commit()
@@ -96,7 +96,6 @@ def edit_transaction(transaction_id):
     elif request.method == 'GET':
         form.title.data = edited_transaction.title
         form.date.data = edited_transaction.date
-        form.amount.data = edited_transaction.amount
         form.description.data= edited_transaction.description
         form.income.data = edited_transaction.income
         form.is_recurring.data = edited_transaction.is_recurring
@@ -104,6 +103,7 @@ def edit_transaction(transaction_id):
         form.interval.data = edited_transaction.interval
         form.count.data = edited_transaction.count
         form.until.data = edited_transaction.until
+        form.amount.data = edited_transaction.return_amount()
         if edited_transaction.is_recurring:
             form.byweekday.data = edited_transaction.return_byweekday()
     return render_template(

@@ -19,11 +19,14 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(120), index=True, unique=True)
     password_hash = db.Column(db.String(128))
     start_date = db.Column(db.Date, nullable=False)
-    start_balance = db.Column(db.Float, nullable=False)
+    start_balance = db.Column(db.Integer, nullable=False)
     transactions = db.relationship('Transaction', backref='user', lazy='dynamic')
 
     def __repr__(self):
         return '<User {}>'.format(self.username)
+
+    def set_start_balance(self, start_balance):
+        self.start_balance = int(round(start_balance * 100))
 
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -74,7 +77,7 @@ class User(UserMixin, db.Model):
                 month_start_balance = month_start_balance + transaction.amount
             else:
                 month_start_balance = month_start_balance - transaction.amount
-        return month_start_balance
+        return (month_start_balance / 100)
 
     def month_transactions(self, year, month):
         month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
@@ -102,12 +105,13 @@ class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    amount = db.Column(db.Numeric(precision=2), nullable=False)
+    #amount = db.Column(db.Numeric(precision=2), nullable=False)
+    amount = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200))
     income = db.Column(db.Boolean)
     is_recurring = db.Column(db.Boolean)
     freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
-    interval = db.Column(db.Numeric(precision=0))
+    interval = db.Column(db.Integer)
     day = {}
     day['mon'] = db.Column(db.Boolean)
     day['tue'] = db.Column(db.Boolean)
@@ -116,13 +120,19 @@ class Transaction(db.Model):
     day['fri'] = db.Column(db.Boolean)
     day['sat'] = db.Column(db.Boolean)
     day['sun'] = db.Column(db.Boolean)
-    count = db.Column(db.Numeric(precision=0))  # number of occurrences (Cannot be used with until)
+    count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
     until = db.Column(db.Date)                  # recurrence end date (Cannot be used with count)
     transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
+
+    def set_amount(self, amount):
+        self.amount = int(round(amount * 100))
+
+    def return_amount(self):
+        return (self.amount / 100)
 
     def set_byweekday(self, byweekday):
         for key in self.day.keys():
@@ -138,12 +148,9 @@ class Transaction(db.Model):
         return byweekday
 
     def return_transactions_between(self, start, end):
-        byweekday = []
         freq = WEEKLY
         count = 10
-#        for key,value in self.day.items():
-#            if value is True:
-#                byweekday.append(key)
+        byweekday = return_byweekday()
 
         dates = rruleset()
         dates.rrule(rrule(
@@ -175,6 +182,6 @@ class Transaction(db.Model):
 
 class TransactionException(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.Date, nullable=False)
     delete = db.Column(db.Boolean)
     transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)

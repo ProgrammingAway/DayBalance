@@ -40,11 +40,11 @@ def register():
     form = RegistrationForm(request.form)
     if request.method == 'POST' and form.validate():
         user = User(
-            username=form.username.data, 
-            email=form.email.data, 
-            start_date=form.start_date.data, 
-            start_balance=form.start_balance.data,
+            username=form.username.data,
+            email=form.email.data,
+            start_date=form.start_date.data,
         )
+        user.set_start_balance(form.start_balance.data)
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -55,11 +55,11 @@ def register():
             user_id=row.id,
             title="Initial Balance", 
             date=form.start_date.data,
-            amount=form.start_balance.data,
             description="Initial Balance",
             income=True,
             is_recurring=False,
         )
+        transaction.set_amount(form.start_balance.data)
         db.session.add(transaction)
         db.session.commit()
 

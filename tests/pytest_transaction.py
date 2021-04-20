@@ -82,6 +82,7 @@ def test_byweekday(db_one_user):
     assert False == t.day["mon"]
     t.day = {"mon":True, "sun":False}
     byweekday = t.return_byweekday()
-    assert byweekday contains "mon"
-    assert byweekday not contains "sun"
-    assert byweekday not contains "wed"
+    assert "mon" in byweekday
+    assert "sun" not in byweekday
+    assert "wed" not in byweekday
+    

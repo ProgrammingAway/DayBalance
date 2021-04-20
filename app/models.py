@@ -150,7 +150,7 @@ class Transaction(db.Model):
     def return_transactions_between(self, start, end):
         freq = WEEKLY
         count = 10
-        byweekday = return_byweekday()
+        byweekday = self.return_byweekday()
 
         dates = rruleset()
         dates.rrule(rrule(

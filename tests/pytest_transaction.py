@@ -2,7 +2,7 @@
 from app import create_app, db
 from app.models import User, Transaction
 from config import Config
-from datetime import date
+from datetime import datetime, date
 import pytest
 
 

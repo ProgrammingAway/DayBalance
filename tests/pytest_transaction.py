@@ -40,7 +40,7 @@ def db_one_user(setup_db):
     
 @pytest.fixture
 def db_two_user(db_one_user):
-    add_user_1()
+    db_one_user()
     u = User(username='Oreo')
     u.set_password('password2')
     u.email = 'oreo@email.com'

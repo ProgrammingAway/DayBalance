@@ -117,7 +117,7 @@ class Transaction(db.Model):
     day['sat'] = db.Column(db.Boolean)
     day['sun'] = db.Column(db.Boolean)
     count = db.Column(db.Numeric(precision=0))  # number of occurrences (Cannot be used with until)
-    until = db.Column(db.Date)  # recurrence end date (Cannot be used with count)
+    until = db.Column(db.Date)                  # recurrence end date (Cannot be used with count)
     transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 

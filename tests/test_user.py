@@ -26,13 +26,13 @@ class UserModelCase(unittest.TestCase):
         password='password',
         email='name@email.com',
         start_date=datetime.now(),
-        start_balance=10.00,
+        start_balance=100.00,
     ):
         u = User(username=username)
         u.set_password(password)
         u.email = email
         u.start_date = start_date
-        u.start_balance = start_balance
+        u.set_start_balance(start_balance)
         db.session.add(u)
         db.session.commit()
         return User.query.filter_by(id=u.id).first()
@@ -46,7 +46,8 @@ class UserModelCase(unittest.TestCase):
         income=False,
         is_recurring=False,
     ):
-        t = Transaction(user_id=user_id, title=title, date=date, amount=amount, income=income, is_recurring=is_recurring)
+        t = Transaction(user_id=user_id, title=title, date=date, income=income, is_recurring=is_recurring)
+        t.set_amount(amount)
         db.session.add(t)
         db.session.commit()
         return Transaction.query.filter_by(id=t.id).first()
@@ -75,6 +76,11 @@ class UserModelCase(unittest.TestCase):
         new_u_fail2 = User.verify_reset_password_token(token_fail2)
         self.assertNotEqual(u, new_u_fail2) # Test fails to different user
 
+    def test_set_start_balance(self):
+        u = self.createTestUser(username='panda')
+        u.set_start_balance(543.21)
+        self.assertEqual(54321, u.start_balance)
+
     def test_weekday_headers(self):
         u = self.createTestUser(username='panda')
         if self.app.config['START_MONDAY']:
@@ -100,11 +106,11 @@ class UserModelCase(unittest.TestCase):
         self.assertFalse(day3_15 in dates)
 
     def test_month_starting_balance(self):
-        u = self.createTestUser(username='panda', start_date=date(2021,1,1), start_balance=500.00)
-        t1 = self.createTestTransaction(user_id=u.id, date=date(2021,6,5), amount='100', income=False)
-        t2 = self.createTestTransaction(user_id=u.id, date=date(2021,6,12), amount='30.22', income=False)
-        t3 = self.createTestTransaction(user_id=u.id, date=date(2021,6,22), amount='20', income=True)
-        t4 = self.createTestTransaction(user_id=u.id, date=date(2021,7,4), amount='12.36', income=False)
+        u = self.createTestUser(username='panda', start_date=date(2021,1,1))
+        t1 = self.createTestTransaction(user_id=u.id, date=date(2021,6,5), amount=100.00, income=False)
+        t2 = self.createTestTransaction(user_id=u.id, date=date(2021,6,12), amount=30.22, income=False)
+        t3 = self.createTestTransaction(user_id=u.id, date=date(2021,6,22), amount=20.00, income=True)
+        t4 = self.createTestTransaction(user_id=u.id, date=date(2021,7,4), amount=12.36, income=False)
 
         july_start_balance = 0
         for transaction in [t1, t2, t3]:
@@ -112,7 +118,7 @@ class UserModelCase(unittest.TestCase):
                 july_start_balance = july_start_balance + transaction.amount
             else:
                 july_start_balance = july_start_balance - transaction.amount
-        self.assertEqual(july_start_balance, u.month_starting_balance(2021, 7))
+        self.assertEqual((july_start_balance / 100), u.month_starting_balance(2021, 7))
 
         august_start_balance = july_start_balance
         for transaction in [t4]:
@@ -120,7 +126,7 @@ class UserModelCase(unittest.TestCase):
                 august_start_balance = august_start_balance + transaction.amount
             else:
                 august_start_balance = august_start_balance - transaction.amount
-        self.assertEqual(august_start_balance, u.month_starting_balance(2021, 8))
+        self.assertEqual((august_start_balance / 100), u.month_starting_balance(2021, 8))
 
     def test_month_transactions(self):
         u = self.createTestUser(username='panda')

@@ -15,15 +15,15 @@ class TestConfig(Config):
 
 @pytest.fixture
 def setup_db():
-    self.app = create_app(TestConfig)
-    self.app_context = self.app.app_context()
-    self.app_context.push()
+    app = create_app(TestConfig)
+    app_context = app.app_context()
+    app_context.push()
     db.create_all()
     yield
     # Tear Down
     db.session.remove()
     db.drop_all()
-    self.app_context.pop()
+    app_context.pop()
 
 
 @pytest.fixture
@@ -67,21 +67,21 @@ def createTestTransaction(
 def test_amount(db_one_user):
     db_one_user()
     user1 = User.query.filter_by(username='Panda').first()
-    t = self.createTestTransaction(user_id=user1.id)
+    t = createTestTransaction(user_id=user1.id)
     t.set_amount(123.45)
-    self.assertEqual(12345, t.amount)
+    assert 12345 == t.amount
     t.amount = 54321
-    self.assertEqual(543.21, t.return_amount())
+    assert 543.21 == t.return_amount()
 
 def test_byweekday(db_one_user):
     db_one_user()
     user1 = User.query.filter_by(username='Panda').first()
-    t = self.createTestTransaction(user_id=user1.id)
+    t = createTestTransaction(user_id=user1.id)
     t.set_byweekday(["sun"])
-    self.assertTrue(t.day["sun"])
-    self.assertFalse(t.day["mon"])
+    assert True == t.day["sun"]
+    assert False == t.day["mon"]
     t.day = {"mon":True, "sun":False}
     byweekday = t.return_byweekday()
-    self.assertIn("mon", byweekday)
-    self.assertNotIn("sun", byweekday)
-    self.assertNotIn("wed", byweekday)
+    assert byweekday contains "mon"
+    assert byweekday not contains "sun"
+    assert byweekday not contains "wed"

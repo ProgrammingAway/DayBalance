@@ -105,7 +105,9 @@ class User(UserMixin, db.Model):
 class Transaction(db.Model):
     day_values = {'SU':SU, 'MO':MO, 'TU':TU, 'WE':WE, 'TH':TH, 'FR':FR, 'SA':SA}
     freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
+    recurring_dates = rruleset()
 
+    # Inputs for database
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False)
     date = db.Column(db.Date, nullable=False)
@@ -124,10 +126,9 @@ class Transaction(db.Model):
     day['SA'] = db.Column(db.Boolean)
     day['SU'] = db.Column(db.Boolean)
     count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
-    until = db.Column(db.Date)                  # recurrence end date (Cannot be used with count)
+    until = db.Column(db.Date)     # recurrence end date (Cannot be used with count)
     transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    recurring_dates = rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -154,6 +155,7 @@ class Transaction(db.Model):
                 self.day[weekday] = True
                 byweekday_rrule.append(self.day_values[weekday])
         freq_rrule = self.freq_values[self.freq]
+        self.recurring_dates = rruleset()
         self.recurring_dates.rrule(rrule(
             freq=freq_rrule,
             dtstart=self.date,

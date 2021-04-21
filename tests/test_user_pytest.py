@@ -4,21 +4,34 @@ from app.models import User, Transaction
 from datetime import datetime, date
 import pytest
 
-def createTestTransaction(
+def create_test_transaction(
     user_id,
     title='Test Transaction',
     date=datetime.now(),
     amount=100.00,
+    description='Test Description',
     income=False,
     is_recurring=False,
+    freq=None,
+    interval=None,
+    count=None,
+    until=None,
 ):
-    t = Transaction(user_id=user_id, title=title, date=date, income=income, is_recurring=is_recurring)
+    t = Transaction(
+        user_id=user_id,
+        title=title,
+        date=date,
+        income=income,
+        is_recurring=is_recurring,
+        freq=freq,
+        interval=interval,
+        count=count,
+        until=until,
+    )
     t.set_amount(amount)
     db.session.add(t)
     db.session.commit()
     return Transaction.query.filter_by(id=t.id).first()
-
-
 
 def test_password_hashing(db_one_user):
     db_one_user
@@ -79,10 +92,10 @@ def test_month_day(db_one_user):
 def test_month_starting_balance(db_one_user):
     db_one_user
     user1 = User.query.filter_by(username='Panda').first()
-    t1 = createTestTransaction(user_id=user1.id, date=date(2021,6,5), amount=100.00, income=False)
-    t2 = createTestTransaction(user_id=user1.id, date=date(2021,6,12), amount=30.22, income=False)
-    t3 = createTestTransaction(user_id=user1.id, date=date(2021,6,22), amount=20.00, income=True)
-    t4 = createTestTransaction(user_id=user1.id, date=date(2021,7,4), amount=12.36, income=False)
+    t1 = create_test_transaction(user_id=user1.id, date=date(2021,6,5), amount=100.00, income=False)
+    t2 = create_test_transaction(user_id=user1.id, date=date(2021,6,12), amount=30.22, income=False)
+    t3 = create_test_transaction(user_id=user1.id, date=date(2021,6,22), amount=20.00, income=True)
+    t4 = create_test_transaction(user_id=user1.id, date=date(2021,7,4), amount=12.36, income=False)
 
     july_start_balance = 0
     for transaction in [t1, t2, t3]:

@@ -1,8 +1,8 @@
 """initial tables
 
-Revision ID: 887516842d01
+Revision ID: 42e8ee9014be
 Revises: 
-Create Date: 2021-04-16 20:47:39.074427
+Create Date: 2021-04-20 23:21:25.393041
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '887516842d01'
+revision = '42e8ee9014be'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,7 +24,7 @@ def upgrade():
     sa.Column('email', sa.String(length=120), nullable=True),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
     sa.Column('start_date', sa.Date(), nullable=False),
-    sa.Column('start_balance', sa.Float(), nullable=False),
+    sa.Column('start_balance', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_email'), 'user', ['email'], unique=True)
@@ -33,7 +33,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=40), nullable=False),
     sa.Column('date', sa.Date(), nullable=False),
-    sa.Column('amount', sa.Float(), nullable=False),
+    sa.Column('amount', sa.Integer(), nullable=False),
     sa.Column('description', sa.String(length=200), nullable=True),
     sa.Column('income', sa.Boolean(), nullable=True),
     sa.Column('is_recurring', sa.Boolean(), nullable=True),
@@ -47,7 +47,7 @@ def upgrade():
     )
     op.create_table('transaction_exception',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('date', sa.DateTime(), nullable=False),
+    sa.Column('date', sa.Date(), nullable=False),
     sa.Column('delete', sa.Boolean(), nullable=True),
     sa.Column('transaction_id', sa.Integer(), nullable=False),
     sa.ForeignKeyConstraint(['transaction_id'], ['transaction.id'], ),

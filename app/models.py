@@ -4,7 +4,8 @@ from flask_login import UserMixin
 from calendar import day_abbr, month_name
 from time import time
 from datetime import datetime
-from dateutil.rrule import rrule, rruleset, YEARLY, MONTHLY, WEEKLY, DAILY
+from dateutil.rrule import YEARLY, MONTHLY, WEEKLY, DAILY
+from dateutil.rrule import rrule, rruleset, SU, MO, TU, WE, TH, FR, SA
 import jwt
 from app import db, login, balance_calendar
 
@@ -102,10 +103,12 @@ class User(UserMixin, db.Model):
 
 
 class Transaction(db.Model):
+    day_values = {'SU':SU, 'MO':MO, 'TU':TU, 'WE':WE, 'TH':TH, 'FR':FR, 'SA':SA}
+    freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
+
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False)
     date = db.Column(db.Date, nullable=False)
-    #amount = db.Column(db.Numeric(precision=2), nullable=False)
     amount = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200))
     income = db.Column(db.Boolean)
@@ -113,17 +116,18 @@ class Transaction(db.Model):
     freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
     interval = db.Column(db.Integer)
     day = {}
-    day['mon'] = db.Column(db.Boolean)
-    day['tue'] = db.Column(db.Boolean)
-    day['wed'] = db.Column(db.Boolean)
-    day['thu'] = db.Column(db.Boolean)
-    day['fri'] = db.Column(db.Boolean)
-    day['sat'] = db.Column(db.Boolean)
-    day['sun'] = db.Column(db.Boolean)
+    day['MO'] = db.Column(db.Boolean)
+    day['TU'] = db.Column(db.Boolean)
+    day['WE'] = db.Column(db.Boolean)
+    day['TH'] = db.Column(db.Boolean)
+    day['FR'] = db.Column(db.Boolean)
+    day['SA'] = db.Column(db.Boolean)
+    day['SU'] = db.Column(db.Boolean)
     count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
     until = db.Column(db.Date)                  # recurrence end date (Cannot be used with count)
     transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    recurring_dates = rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -134,12 +138,6 @@ class Transaction(db.Model):
     def return_amount(self):
         return (self.amount / 100)
 
-    def set_byweekday(self, byweekday):
-        for key in self.day.keys():
-            self.day[key] = False
-        for weekday in byweekday:
-            self.day[weekday] = True
-
     def return_byweekday(self):
         byweekday = []
         for key,value in self.day.items():
@@ -147,38 +145,35 @@ class Transaction(db.Model):
                 byweekday.append(key)
         return byweekday
 
-    def return_transactions_between(self, start, end):
-        freq = WEEKLY
-        count = 10
-        byweekday = self.return_byweekday()
-
-        dates = rruleset()
-        dates.rrule(rrule(
-            freq=freq, 
-            dtstart=self.date, 
-            interval=self.interval, 
-#            count=self.count, 
-            count=count, 
-            until=self.until, 
-            byweekday=byweekday, 
+    def set_recurring(self, byweekday=[]):
+        byweekday_rrule = []
+        for key in self.day.keys():
+            self.day[key] = False
+        if byweekday is not None:
+            for weekday in byweekday:
+                self.day[weekday] = True
+                byweekday_rrule.append(self.day_values[weekday])
+        freq_rrule = self.freq_values[self.freq]
+        self.recurring_dates.rrule(rrule(
+            freq=freq_rrule,
+            dtstart=self.date,
+            interval=self.interval,
+            count=self.count,
+            until=self.until,
+            byweekday=byweekday_rrule,
             wkst=balance_calendar.firstweekday,
         ))
 
-        exceptions = TransactionException.query.filter(
-            TransactionException.transaction_id == self.id,
-            TransactionException.date >= start,
-            TransactionException.date <= end,
-        )
-
+    def return_transactions_between(self, start, end):
         for exception in exceptions:
             if exception.delete:
-                dates.exdate(exception.date)
+                self.recurring_dates.exdate(exception.date)
             else:
-                dates.rdate(exception.date)
+                self.recurring_dates.rdate(exception.date)
 
         start_datetime = datetime.combine(start, datetime.min.time())
         end_datetime = datetime.combine(end, datetime.min.time())
-        return dates.between(before=start_datetime, after=end_datetime, inc=True)
+        return self.recurring_dates.between(before=start_datetime, after=end_datetime, inc=True)
 
 class TransactionException(db.Model):
     id = db.Column(db.Integer, primary_key=True)

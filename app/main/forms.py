@@ -14,7 +14,7 @@ class TransactionForm(Form):
     is_recurring = BooleanField('Recurring')
     freq = SelectField('Frequency', choices=[('YEARLY', 'Year(s)'), ('MONTHLY', 'Month(s)'), ('WEEKLY', 'Week(s)'), ('DAILY', 'Day(s)')], validators=[Optional()])
     interval = IntegerField('Frequency Interval', validators=[NumberRange(min=1, max=100), Optional()])
-    byweekday = SelectMultipleField('Day of the Week', choices=[('sun', 'Sunday'), ('mon', 'Monday'), ('tue', 'Tuesday'), ('wed', 'Wednesday'), ('thu', 'Thursday'), ('fri', 'Friday'), ('sat', 'Saturday')], validators=[Optional()])
+    byweekday = SelectMultipleField('Day of the Week', choices=[('SU', 'Sunday'), ('MO', 'Monday'), ('TU', 'Tuesday'), ('WE', 'Wednesday'), ('TH', 'Thursday'), ('FR', 'Friday'), ('SA', 'Saturday')], validators=[Optional()])
     # Cannot use until and count together
     count = IntegerField('Number of Transactions', validators=[NumberRange(min=1, max=100), Optional()])
     until = DateField('End Date', validators=[Optional()])

@@ -58,7 +58,7 @@ def add_transaction():
         )
         transaction.set_amount(form.amount.data)
         if form.is_recurring.data:
-            transaction.set_byweekday(form.byweekday.data)
+            transaction.set_recurring(form.byweekday.data)
         db.session.add(transaction)
         db.session.commit()
 
@@ -89,7 +89,7 @@ def edit_transaction(transaction_id):
         edited_transaction.until = form.until.data
         edited_transaction.set_amount(form.amount.data)
         if form.is_recurring.data:
-            edited_transaction.set_byweekday(form.byweekday.data)
+            edited_transaction.set_recurring(form.byweekday.data)
         db.session.commit()
         flash("Your changes have been saved.")
         return redirect(url_for("main.index"))

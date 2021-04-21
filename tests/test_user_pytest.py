@@ -46,14 +46,16 @@ def test_set_start_balance(db_one_user):
     user1 = User.query.filter_by(username='Panda').first()
     assert 123456 == user1.start_balance
 
-def test_weekday_headers(db_one_user):
+def test_weekday_headers_mon(db_one_user):
     db_one_user
     user1 = User.query.filter_by(username='Panda').first()
     weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    #if app.config['START_MONDAY']:
-    #    weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    #else:
-    #    weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    assert weekdays == user1.weekday_headers()
+
+def test_weekday_headers_sun(db_one_user_sun):
+    db_one_user_sun
+    user1 = User.query.filter_by(username='Panda').first()
+    weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
     assert weekdays == user1.weekday_headers()
 
 def test_month_name(db_one_user):

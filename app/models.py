@@ -165,11 +165,11 @@ class Transaction(db.Model):
         ))
 
     def return_transactions_between(self, start, end):
-        for exception in exceptions:
-            if exception.delete:
-                self.recurring_dates.exdate(exception.date)
-            else:
-                self.recurring_dates.rdate(exception.date)
+        #for exception in exceptions:
+        #    if exception.delete:
+        #        self.recurring_dates.exdate(exception.date)
+        #    else:
+        #        self.recurring_dates.rdate(exception.date)
 
         start_datetime = datetime.combine(start, datetime.min.time())
         end_datetime = datetime.combine(end, datetime.min.time())

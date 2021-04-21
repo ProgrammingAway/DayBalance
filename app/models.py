@@ -63,15 +63,39 @@ class User(UserMixin, db.Model):
     def month_days(self, year, month):
         return balance_calendar.itermonthdates(year, month)
 
+    def return_transactions_between(self, start, end):
+        """This function adds all transactions (recurring and non-recurring) that
+        occurs for all dates between the budget start date and the first
+        visible day of this calendar month.
+        """
+        transactions = Transaction.query.filter(
+            Transaction.user_id == self.id,
+            Transaction.is_recurring == False,
+            Transaction.date >= start,
+            Transaction.date < end,
+        )
+        
+        recurring_transactions = Transaction.query.filter(
+            Transaction.user_id == self.id,
+            Transaction.is_recurring == True,
+        )
+        
+        for recurring_transaction in recurring_transactions:
+            transactions.extend(recurring_transaction.return_transactions_between(self.start_date, month_start_day))
+        
+        return transactions
+        
+        
     def month_starting_balance(self, year, month):
+        """Returns the starting balance for the current month.
+        This function adds all transactions (recurring and non-recurring) that
+        occurs for all dates between the budget start date and the first
+        visible day of this calendar month.
+        """
         month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
         month_start_balance = 0
 
-        prev_transactions = Transaction.query.filter(
-            Transaction.user_id == self.id,
-            Transaction.date >= self.start_date,
-            Transaction.date < month_start_day
-        )
+        prev_transactions = self.return_transactions_between(self.start_date, month_start_day)
 
         for transaction in prev_transactions:
             if transaction.income == True:
@@ -81,23 +105,13 @@ class User(UserMixin, db.Model):
         return (month_start_balance / 100)
 
     def month_transactions(self, year, month):
+        """Returns all transactions (recurring and non-recurring) that
+        occur durring all dates of the calendar that this month shows
+        """
         month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
         month_end_day = list(balance_calendar.itermonthdates(year, month))[-1]
-        month_transactions = Transaction.query.filter(
-            Transaction.user_id == self.id,
-#            Transaction.is_recurring == False,
-            Transaction.date >= month_start_day,
-            Transaction.date <= month_end_day,
-        )
 
-        #recurring_transactions = Transaction.query.filter(
-        #    Transaction.user_id == self.id,
-        #    Transaction.is_recurring == True,
-        #)
-
-        #recurring = []
-        #for transaction in recurring_transactions:
-        #    recurring.append(transaction.return_transactions_between(month_start_day, month_end_day))
+        month_transactions = self.return_transactions_between(month_start_day, month_end_day)
 
         return month_transactions
 
@@ -167,15 +181,26 @@ class Transaction(db.Model):
         ))
 
     def return_transactions_between(self, start, end):
-        #for exception in exceptions:
-        #    if exception.delete:
-        #        self.recurring_dates.exdate(exception.date)
-        #    else:
-        #        self.recurring_dates.rdate(exception.date)
-
+        """Returns all recurring transactions that
+        occur between the start and end date
+        """
         start_datetime = datetime.combine(start, datetime.min.time())
         end_datetime = datetime.combine(end, datetime.min.time())
-        return self.recurring_dates.between(before=start_datetime, after=end_datetime, inc=True)
+        
+        recurring_transactions = []
+        recurring_dates = self.recurring_dates.between(before=start_datetime, after=end_datetime, inc=True)
+        for date in recurring_dates:
+            transaction = Transaction(
+                id = self.id,
+                user_id = current_user.id,
+                title = self.title, 
+                date = date,
+                amount = self.amount,
+                income = self.income,
+            )
+            recurring_transactions.append(transaction)
+
+        return recurring_transactions
 
 class TransactionException(db.Model):
     id = db.Column(db.Integer, primary_key=True)

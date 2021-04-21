@@ -81,7 +81,7 @@ class User(UserMixin, db.Model):
         )
         
         for recurring_transaction in recurring_transactions:
-            transactions.extend(recurring_transaction.return_transactions_between(self.start_date, month_start_day))
+            transactions.extend(recurring_transaction.return_transactions_between(start, end))
         
         return transactions
         
@@ -192,7 +192,7 @@ class Transaction(db.Model):
         for date in recurring_dates:
             transaction = Transaction(
                 id = self.id,
-                user_id = current_user.id,
+                user_id = self.user_id,
                 title = self.title, 
                 date = date,
                 amount = self.amount,

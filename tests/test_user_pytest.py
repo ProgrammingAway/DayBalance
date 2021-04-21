@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+from app import db
+from app.models import User, Transaction
+from datetime import datetime, date
+import pytest
+
+def createTestTransaction(
+    user_id,
+    title='Test Transaction',
+    date=datetime.now(),
+    amount=100.00,
+    income=False,
+    is_recurring=False,
+):
+    t = Transaction(user_id=user_id, title=title, date=date, income=income, is_recurring=is_recurring)
+    t.set_amount(amount)
+    db.session.add(t)
+    db.session.commit()
+    return Transaction.query.filter_by(id=t.id).first()
+
+
+
+def test_password_hashing(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    assert user1.check_password('other_password') is False
+    assert user1.check_password('password') is True
+
+def test_token(db_two_users):
+    db_two_users
+    user1 = User.query.filter_by(username='Panda').first()
+    token_pass = user1.get_reset_password_token()
+    return1_user = User.verify_reset_password_token(token_pass)
+    assert user1 == return1_user
+    # Move first character to the back to change the token
+    token_fail = token_pass[1:] + token_pass[0]
+    return2_user = User.verify_reset_password_token(token_fail)
+    assert user1 != return2_user
+    user2 = User.query.filter_by(username='Oreo').first()
+    token_fail2 = user2.get_reset_password_token()
+    return3_user = User.verify_reset_password_token(token_fail2)
+    assert user1 != return3_user
+
+def test_set_start_balance(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    assert 123456 == user1.start_balance
+
+def test_weekday_headers(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    #if app.config['START_MONDAY']:
+    #    weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    #else:
+    #    weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+    assert weekdays == user1.weekday_headers()
+
+def test_month_name(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    months = { 1:"January", 2:"February", 3:"March", 4:"April", 5:"May",
+        6:"June", 7:"July", 8:"August", 9:"September", 10:"October",
+        11:"November", 12:"December"}
+    for num,name in months.items():
+        assert name ==  user1.month_name(num)
+
+def test_month_day(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    dates = user1.month_days(2020, 2)
+    day2_29 = date(2020, 2, 29)
+    day3_15 = date(2020, 3, 15)
+    assert day2_29 in dates
+    assert day3_15 not in dates
+
+def test_month_starting_balance(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    t1 = createTestTransaction(user_id=user1.id, date=date(2021,6,5), amount=100.00, income=False)
+    t2 = createTestTransaction(user_id=user1.id, date=date(2021,6,12), amount=30.22, income=False)
+    t3 = createTestTransaction(user_id=user1.id, date=date(2021,6,22), amount=20.00, income=True)
+    t4 = createTestTransaction(user_id=user1.id, date=date(2021,7,4), amount=12.36, income=False)
+
+    july_start_balance = 0
+    for transaction in [t1, t2, t3]:
+        if transaction.income:
+            july_start_balance = july_start_balance + transaction.amount
+        else:
+            july_start_balance = july_start_balance - transaction.amount
+    assert (july_start_balance / 100) == user1.month_starting_balance(2021, 7)
+
+    august_start_balance = july_start_balance
+    for transaction in [t4]:
+        if transaction.income:
+            august_start_balance = august_start_balance + transaction.amount
+        else:
+            august_start_balance = august_start_balance - transaction.amount
+    assert (august_start_balance / 100) == user1.month_starting_balance(2021, 8)
+
+def test_month_transactions(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    pass

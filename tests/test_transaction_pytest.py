@@ -17,22 +17,27 @@ def test_amount(db_one_user):
     t.amount = 54321
     assert 543.21 == t.return_amount()
 
-# def test_set_recurring(db_one_user):
-#     db_one_user
-#     user1 = User.query.filter_by(username='Panda').first()
-#     t = create_test_transaction(user_id=user1.id, date=date(2021, 4, 1), is_recurring=True, freq=WEEKLY)
-#     t.set_recurring()
-#     assert t.recurring_dates is False
-
-# def test_byweekday(db_one_user):
-#     db_one_user
-#     user1 = User.query.filter_by(username='Panda').first()
-#     t = createTestTransaction(user_id=user1.id)
-#     t.set_byweekday(["sun"])
-#     assert True == t.day["sun"]
-#     assert False == t.day["mon"]
-#     t.day = {"mon":True, "sun":False}
-#     byweekday = t.return_byweekday()
-#     assert "mon" in byweekday
-#     assert "sun" not in byweekday
-#     assert "wed" not in byweekday
+def test_set_recurring(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    t = create_test_transaction(
+        user_id=user1.id, 
+        date=date(2021, 4, 1), 
+        is_recurring=True, 
+        freq="WEEKLY", 
+        interval=1, 
+        count=3,
+    )
+    t.set_recurring(["TH"])
+    # day[] = [ "MO", "TU", "WE", "TH", "FR", "SA", "SU" ]
+    assert t.day == [ False, False, False, True, False, False, False ]
+    assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
+    assert ["TH"] == t.return_byweekday()
+    t.set_recurring(["FR", "TU"])
+    assert t.day == [ False, True, False, False, True, False, False ]
+    assert list(t.recurring_dates) == [datetime(2021, 4, 2), datetime(2021, 4, 6), datetime(2021, 4, 9)]
+    assert ["TU", "FR"] == t.return_byweekday()
+    t.set_recurring(None)
+    assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
+    assert t.day == [ False, False, False, True, False, False, False ]
+    assert ["TH"] == t.return_byweekday()

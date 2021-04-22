@@ -1,12 +1,24 @@
 #!/usr/bin/env python
 from app import create_app, db
 from app.models import User, Transaction
+from app.main.forms import TransactionForm
 from config import Config
 from datetime import datetime, date
 from dateutil.rrule import YEARLY, MONTHLY, WEEKLY, DAILY, SU, MO, TU, WE, TH, FR, SA
 import pytest
 from test_user_pytest import create_test_transaction
 
+
+def test_form_validate(db_one_user):
+    db_one_user
+    user1 = User.query.filter_by(username='Panda').first()
+    user1.start_date = date(2021, 3, 1)
+    transaction1_form = TransactionForm(title="Bill1", date=date(2021, 2, 1), amount=100.00)
+    assert transaction1_form.validate() == False
+    transaction2_form = TransactionForm(title="Bill2", date=date(2021, 3, 1), amount=200.00)
+    assert transaction2_form.validate() == True
+    transaction3_form = TransactionForm(title="Bill3", date=date(2021, 4, 1), amount=300.00)
+    assert transaction3_form.validate() == True
 
 def test_amount(db_one_user):
     db_one_user

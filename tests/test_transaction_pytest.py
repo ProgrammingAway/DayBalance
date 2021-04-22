@@ -41,7 +41,7 @@ def test_set_recurring(db_one_user):
 def test_return_transactions_between(db_one_user):
     db_one_user
     user1 = User.query.filter_by(username='Panda').first()
-    t = create_test_transaction(
+    t1 = create_test_transaction(
         user_id=user1.id, 
         date=date(2021, 4, 1), 
         is_recurring=True, 
@@ -49,11 +49,26 @@ def test_return_transactions_between(db_one_user):
         interval=1, 
         count=3,
     )
-    t.set_recurring(None)
-    recurring_transactions = t.return_transactions_between(before=date(2021, 5, 1), after=date(2021, 4, 2))
-    for transaction in recurring_transactions:
-        assert transaction.title == t.title
-        if transaction.date == date(2021, 4, 8) or transaction.date == date(2021, 4, 15):
+    recurring_transactions1 = t1.return_transactions_between(before=date(2021, 5, 1), after=date(2021, 4, 2))
+    for transaction in recurring_transactions1:
+        assert transaction1.title == t1.title
+        if transaction1.date in [ date(2021, 4, 8), date(2021, 4, 15) ]:
             assert True
         else:
-            assert transaction.date == date(2021, 4, 8)
+            assert transaction1.date == False
+
+    t2 = create_test_transaction(
+        user_id=user1.id,
+        title="Another Recurring Bill",
+        date=date(2021, 5, 5), 
+        is_recurring=True, 
+        freq="MONTHLY", 
+        interval=1, 
+    )
+    recurring_transactions2 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
+    for transaction in recurring_transactions2:
+        assert transaction2.title == t2.title
+        if transaction2.date in [ date(2021, 5, 5), date(2021, 6, 5), date(2021, 7, 5) ]:
+            assert True
+        else:
+            assert transaction1.date == False

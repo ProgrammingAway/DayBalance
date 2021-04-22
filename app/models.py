@@ -73,7 +73,7 @@ class User(UserMixin, db.Model):
             Transaction.is_recurring == False,
             Transaction.date >= start,
             Transaction.date < end,
-        )
+        ).all()
         
         recurring_transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
@@ -81,7 +81,8 @@ class User(UserMixin, db.Model):
         )
         
         for recurring_transaction in recurring_transactions:
-            transactions.extend(recurring_transaction.return_transactions_between(start, end))
+            recurring_dates = recurring_transaction.return_transactions_between(start, end)
+            transactions.extend(recurring_dates)
         
         return transactions
         
@@ -117,7 +118,9 @@ class User(UserMixin, db.Model):
 
 
 class Transaction(db.Model):
-    day_values = {'SU':SU, 'MO':MO, 'TU':TU, 'WE':WE, 'TH':TH, 'FR':FR, 'SA':SA}
+#    day_values = {'SU':SU, 'MO':MO, 'TU':TU, 'WE':WE, 'TH':TH, 'FR':FR, 'SA':SA}
+#    day_names = {SU:'SU', MO:'MO', TU:'TU', WE:'WE', TH:'TH', FR:'FR', SA:'SA'}
+    day_names =['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
     freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
     recurring_dates = rruleset()
 
@@ -131,14 +134,14 @@ class Transaction(db.Model):
     is_recurring = db.Column(db.Boolean)
     freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
     interval = db.Column(db.Integer)
-    day = {}
-    day['MO'] = db.Column(db.Boolean)
-    day['TU'] = db.Column(db.Boolean)
-    day['WE'] = db.Column(db.Boolean)
-    day['TH'] = db.Column(db.Boolean)
-    day['FR'] = db.Column(db.Boolean)
-    day['SA'] = db.Column(db.Boolean)
-    day['SU'] = db.Column(db.Boolean)
+    day = [db.Column(db.Boolean) for i in range(7)]
+    #day[0] = db.Column(db.Boolean)
+    #day[1] = db.Column(db.Boolean)
+    #day[2] = db.Column(db.Boolean)
+    #day[3] = db.Column(db.Boolean)
+    #day[4] = db.Column(db.Boolean)
+    #day[5] = db.Column(db.Boolean)
+    #day[6] = db.Column(db.Boolean)
     count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
     until = db.Column(db.Date)     # recurrence end date (Cannot be used with count)
     transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
@@ -153,22 +156,19 @@ class Transaction(db.Model):
     def return_amount(self):
         return (self.amount / 100)
 
-    def return_byweekday(self):
-        byweekday = []
-        for key,value in self.day.items():
-            if value is True:
-                byweekday.append(key)
-        return byweekday
-
-    def set_recurring(self, byweekday=[]):
+    def set_recurring(self, byweekday=None):
         byweekday_rrule = []
-        for key in self.day.keys():
-            self.day[key] = False
-        if byweekday is not None:
+        for i, day in enumerate(self.day):
+            self.day[i] = False
+        if byweekday is None or len(byweekday) == 0:
+            weekday_num = self.date.weekday()
+            byweekday_rrule.append(weekday_num)
+            self.day[weekday_num] = True
+        else:
             for weekday in byweekday:
-                self.day[weekday] = True
-                byweekday_rrule.append(self.day_values[weekday])
-        freq_rrule = self.freq_values[self.freq]
+                self.day[self.day_names.index(weekday)] = True
+                byweekday_rrule.append(self.day_names.index(weekday))
+        freq_rrule = self.freq_values[str(self.freq)]
         self.recurring_dates = rruleset()
         self.recurring_dates.rrule(rrule(
             freq=freq_rrule,
@@ -179,6 +179,13 @@ class Transaction(db.Model):
             byweekday=byweekday_rrule,
             wkst=balance_calendar.firstweekday,
         ))
+
+    def return_byweekday(self):
+        byweekday = []
+        for i, day in enumerate(self.day):
+            if day is True:
+                byweekday.append(self.day_names[i])
+        return byweekday
 
     def return_transactions_between(self, start, end):
         """Returns all recurring transactions that

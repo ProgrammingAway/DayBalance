@@ -170,7 +170,8 @@ class Transaction(db.Model):
         freq_rrule = self.freq_values[str(self.freq)]
         self.recurring_dates = rruleset()
         self.recurring_dates.rrule(rrule(
-            freq=freq_rrule,
+            freq_rrule,
+#            freq=freq_rrule,
             dtstart=self.date,
             interval=self.interval,
             count=self.count,

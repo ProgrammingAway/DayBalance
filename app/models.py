@@ -160,7 +160,7 @@ class Transaction(db.Model):
             self.day_variables[i] = False
         if byweekday is None or len(byweekday) == 0:
             weekday_num = self.date.weekday()
-            byweekday_rrule.append(weekday_num)
+            byweekday_rrule = None
             self.day_variables[weekday_num] = True
         else:
             for weekday in byweekday:
@@ -170,8 +170,7 @@ class Transaction(db.Model):
         freq_rrule = self.freq_values[str(self.freq)]
         self.recurring_dates = rruleset()
         self.recurring_dates.rrule(rrule(
-            freq_rrule,
-#            freq=freq_rrule,
+            freq=freq_rrule,
             dtstart=self.date,
             interval=self.interval,
             count=self.count,

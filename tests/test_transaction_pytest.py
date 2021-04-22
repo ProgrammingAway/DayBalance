@@ -51,11 +51,11 @@ def test_return_transactions_between(db_one_user):
     )
     recurring_transactions1 = t1.return_transactions_between(before=date(2021, 5, 1), after=date(2021, 4, 2))
     for transaction in recurring_transactions1:
-        assert transaction1.title == t1.title
-        if transaction1.date in [ date(2021, 4, 8), date(2021, 4, 15) ]:
+        assert transaction.title == t1.title
+        if transaction.date in [ date(2021, 4, 8), date(2021, 4, 15) ]:
             assert True
         else:
-            assert transaction1.date == False
+            assert transaction.date == False
 
     t2 = create_test_transaction(
         user_id=user1.id,
@@ -67,8 +67,8 @@ def test_return_transactions_between(db_one_user):
     )
     recurring_transactions2 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
     for transaction in recurring_transactions2:
-        assert transaction2.title == t2.title
-        if transaction2.date in [ date(2021, 5, 5), date(2021, 6, 5), date(2021, 7, 5) ]:
+        assert transaction.title == t2.title
+        if transaction.date in [ date(2021, 5, 5), date(2021, 6, 5), date(2021, 7, 5) ]:
             assert True
         else:
-            assert transaction1.date == False
+            assert transaction.date == False

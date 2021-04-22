@@ -74,19 +74,19 @@ class User(UserMixin, db.Model):
             Transaction.date >= start,
             Transaction.date < end,
         ).all()
-        
+
         recurring_transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
             Transaction.is_recurring == True,
         )
-        
+
         for recurring_transaction in recurring_transactions:
             recurring_dates = recurring_transaction.return_transactions_between(start, end)
             transactions.extend(recurring_dates)
-        
+
         return transactions
-        
-        
+
+
     def month_starting_balance(self, year, month):
         """Returns the starting balance for the current month.
         This function adds all transactions (recurring and non-recurring) that
@@ -118,12 +118,6 @@ class User(UserMixin, db.Model):
 
 
 class Transaction(db.Model):
-#    day_values = {'SU':SU, 'MO':MO, 'TU':TU, 'WE':WE, 'TH':TH, 'FR':FR, 'SA':SA}
-#    day_names = {SU:'SU', MO:'MO', TU:'TU', WE:'WE', TH:'TH', FR:'FR', SA:'SA'}
-    day_names =['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
-    freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
-    recurring_dates = rruleset()
-
     # Inputs for database
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(40), nullable=False)
@@ -134,18 +128,22 @@ class Transaction(db.Model):
     is_recurring = db.Column(db.Boolean)
     freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
     interval = db.Column(db.Integer)
-    day = [db.Column(db.Boolean) for i in range(7)]
-    #day[0] = db.Column(db.Boolean)
-    #day[1] = db.Column(db.Boolean)
-    #day[2] = db.Column(db.Boolean)
-    #day[3] = db.Column(db.Boolean)
-    #day[4] = db.Column(db.Boolean)
-    #day[5] = db.Column(db.Boolean)
-    #day[6] = db.Column(db.Boolean)
+    mon = db.Column(db.Boolean)
+    tue = db.Column(db.Boolean)
+    wed = db.Column(db.Boolean)
+    thu = db.Column(db.Boolean)
+    fri = db.Column(db.Boolean)
+    sat = db.Column(db.Boolean)
+    sun = db.Column(db.Boolean)
     count = db.Column(db.Integer)  # number of occurrences (Cannot be used with until)
     until = db.Column(db.Date)     # recurrence end date (Cannot be used with count)
-    transaction_exceptions = db.relationship('TransactionException', backref='transaction', lazy='dynamic')
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
+    # Other variables
+    day_names = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
+    day_variables = [ mon, tue, wed, thu, fri, sat, sun ]
+    freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
+    recurring_dates = rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -156,18 +154,19 @@ class Transaction(db.Model):
     def return_amount(self):
         return (self.amount / 100)
 
-    def set_recurring(self, byweekday=None):
+    def set_recurring(self, byweekday):
         byweekday_rrule = []
-        for i, day in enumerate(self.day):
-            self.day[i] = False
+        for i in range(len(self.day_variables)):
+            self.day_variables[i] = False
         if byweekday is None or len(byweekday) == 0:
             weekday_num = self.date.weekday()
             byweekday_rrule.append(weekday_num)
-            self.day[weekday_num] = True
+            self.day_variables[weekday_num] = True
         else:
             for weekday in byweekday:
-                self.day[self.day_names.index(weekday)] = True
+                self.day_variables[self.day_names.index(weekday)] = True
                 byweekday_rrule.append(self.day_names.index(weekday))
+
         freq_rrule = self.freq_values[str(self.freq)]
         self.recurring_dates = rruleset()
         self.recurring_dates.rrule(rrule(
@@ -182,8 +181,8 @@ class Transaction(db.Model):
 
     def return_byweekday(self):
         byweekday = []
-        for i, day in enumerate(self.day):
-            if day is True:
+        for i in range(len(self.day_variables)):
+            if self.day_variables[i] is True:
                 byweekday.append(self.day_names[i])
         return byweekday
 
@@ -193,7 +192,7 @@ class Transaction(db.Model):
         """
         start_datetime = datetime.combine(start, datetime.min.time())
         end_datetime = datetime.combine(end, datetime.min.time())
-        
+
         recurring_transactions = []
         recurring_dates = self.recurring_dates.between(before=start_datetime, after=end_datetime, inc=True)
         for date in recurring_dates:
@@ -208,9 +207,3 @@ class Transaction(db.Model):
             recurring_transactions.append(transaction)
 
         return recurring_transactions
-
-class TransactionException(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.Date, nullable=False)
-    delete = db.Column(db.Boolean)
-    transaction_id = db.Column(db.Integer, db.ForeignKey('transaction.id'), nullable=False)

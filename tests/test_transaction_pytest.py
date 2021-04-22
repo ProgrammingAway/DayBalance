@@ -29,15 +29,11 @@ def test_set_recurring(db_one_user):
         count=3,
     )
     t.set_recurring(["TH"])
-    # day[] = [ "MO", "TU", "WE", "TH", "FR", "SA", "SU" ]
-    assert t.day == [ False, False, False, True, False, False, False ]
     assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
     assert ["TH"] == t.return_byweekday()
     t.set_recurring(["FR", "TU"])
-    assert t.day == [ False, True, False, False, True, False, False ]
     assert list(t.recurring_dates) == [datetime(2021, 4, 2), datetime(2021, 4, 6), datetime(2021, 4, 9)]
     assert ["TU", "FR"] == t.return_byweekday()
     t.set_recurring(None)
     assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
-    assert t.day == [ False, False, False, True, False, False, False ]
     assert ["TH"] == t.return_byweekday()

@@ -155,14 +155,14 @@ class Transaction(db.Model):
         return (self.amount / 100)
 
     def set_recurring(self, byweekday):
-        byweekday_rrule = []
+        byweekday_rrule = None
         for i in range(len(self.day_variables)):
             self.day_variables[i] = False
-        if byweekday is None or len(byweekday) == 0:
-            weekday_num = self.date.weekday()
-            byweekday_rrule = None
-            self.day_variables[weekday_num] = True
-        else:
+        if byweekday is not None or len(byweekday) > 0:
+#            weekday_num = self.date.weekday()
+#            self.day_variables[weekday_num] = True
+#        else:
+            byweekday_rrule = []
             for weekday in byweekday:
                 self.day_variables[self.day_names.index(weekday)] = True
                 byweekday_rrule.append(self.day_names.index(weekday))

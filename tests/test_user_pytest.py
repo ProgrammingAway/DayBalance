@@ -131,4 +131,31 @@ def test_month_starting_balance(db_one_user):
 def test_month_transactions(db_one_user):
     db_one_user
     user1 = User.query.filter_by(username='Panda').first()
-    pass
+    t1 = create_test_transaction(user_id=user1.id, date=date(2021,6,5), amount=100.00, income=False)
+    t2 = create_test_transaction(user_id=user1.id, date=date(2021,6,12), amount=30.22, income=False)
+    t3 = create_test_transaction(user_id=user1.id, date=date(2021,6,22), amount=20.00, income=True)
+    t4 = create_test_transaction(user_id=user1.id, date=date(2021,7,4), amount=12.36, income=False)
+    t5 = create_test_transaction(
+        user_id=user1.id, 
+        date=date(2021,2,6), 
+        amount=2.22,
+        income=False,
+        is_recurring=True, 
+        freq="MONTHLY", 
+        interval=1, 
+    )
+
+    month_transactions = user1.month_transactions(2021, 6)
+    for transaction in month_transactions:
+        if transaction.date in [ date(2021, 6, 5), date(2021, 6, 12), date(2021, 6, 22), date(2021, 6, 6) ]:
+            assert True
+        else:
+            assert transaction.date == False
+
+    month_transactions = user1.month_transactions(2021, 7)
+    for transaction in month_transactions:
+        if transaction.date in [ date(2021, 7, 4), date(2021, 7, 6) ]:
+            assert True
+        else:
+            assert transaction.date == False
+

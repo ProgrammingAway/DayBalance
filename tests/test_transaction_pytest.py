@@ -50,7 +50,7 @@ def test_return_transactions_between(db_one_user):
         count=3,
     )
     recurring_transactions1 = t1.return_transactions_between(before=date(2021, 5, 1), after=date(2021, 4, 2))
-    assert self.freq == 'WEEKLY'
+    assert t1.freq == 'WEEKLY'
     for transaction in recurring_transactions1:
         assert transaction.title == t1.title
         if transaction.date in [ date(2021, 4, 8), date(2021, 4, 15) ]:
@@ -67,7 +67,7 @@ def test_return_transactions_between(db_one_user):
         interval=1, 
     )
     recurring_transactions2 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
-    assert self.freq == 'MONTHLY'
+    assert t2.freq == 'MONTHLY'
     for transaction in recurring_transactions2:
         assert transaction.title == t2.title
         if transaction.date in [ date(2021, 5, 5), date(2021, 6, 5), date(2021, 7, 5) ]:

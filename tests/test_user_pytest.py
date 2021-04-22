@@ -29,6 +29,8 @@ def create_test_transaction(
         until=until,
     )
     t.set_amount(amount)
+    if is_recurring:
+        t.set_recurring(None)
     db.session.add(t)
     db.session.commit()
     return Transaction.query.filter_by(id=t.id).first()
@@ -96,7 +98,17 @@ def test_month_starting_balance(db_one_user):
     t2 = create_test_transaction(user_id=user1.id, date=date(2021,6,12), amount=30.22, income=False)
     t3 = create_test_transaction(user_id=user1.id, date=date(2021,6,22), amount=20.00, income=True)
     t4 = create_test_transaction(user_id=user1.id, date=date(2021,7,4), amount=12.36, income=False)
+    # t5 = create_test_transaction(
+    #     user_id=user1.id, 
+    #     date=date(2021,2,6), 
+    #     amount=2.22,
+    #     income=False,
+    #     is_recurring=True, 
+    #     freq="MONTHLY", 
+    #     interval=1, 
+    # )
 
+    #july_start_balance = 0 - (5 * t5.amount) # recurring transactions
     july_start_balance = 0
     for transaction in [t1, t2, t3]:
         if transaction.income:
@@ -104,7 +116,10 @@ def test_month_starting_balance(db_one_user):
         else:
             july_start_balance = july_start_balance - transaction.amount
     assert (july_start_balance / 100) == user1.month_starting_balance(2021, 7)
+    # E       assert -110.22 == -156.84
+    # E       assert -121.32 == -156.84
 
+    #august_start_balance = july_start_balance - t5.amount
     august_start_balance = july_start_balance
     for transaction in [t4]:
         if transaction.income:

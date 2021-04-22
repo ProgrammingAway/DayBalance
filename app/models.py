@@ -63,7 +63,7 @@ class User(UserMixin, db.Model):
     def month_days(self, year, month):
         return balance_calendar.itermonthdates(year, month)
 
-    def return_transactions_between(self, start, end):
+    def return_transactions_between(self, before, after):
         """This function adds all transactions (recurring and non-recurring) that
         occurs for all dates between the budget start date and the first
         visible day of this calendar month.
@@ -71,8 +71,8 @@ class User(UserMixin, db.Model):
         transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
             Transaction.is_recurring == False,
-            Transaction.date >= start,
-            Transaction.date < end,
+            Transaction.date >= after,
+            Transaction.date < before,
         ).all()
 
         recurring_transactions = Transaction.query.filter(
@@ -81,7 +81,7 @@ class User(UserMixin, db.Model):
         )
 
         for recurring_transaction in recurring_transactions:
-            recurring_dates = recurring_transaction.return_transactions_between(start, end)
+            recurring_dates = recurring_transaction.return_transactions_between(before=before, after=after)
             transactions.extend(recurring_dates)
 
         return transactions
@@ -96,7 +96,7 @@ class User(UserMixin, db.Model):
         month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
         month_start_balance = 0
 
-        prev_transactions = self.return_transactions_between(self.start_date, month_start_day)
+        prev_transactions = self.return_transactions_between(after=self.start_date, before=month_start_day)
 
         for transaction in prev_transactions:
             if transaction.income == True:
@@ -112,7 +112,7 @@ class User(UserMixin, db.Model):
         month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
         month_end_day = list(balance_calendar.itermonthdates(year, month))[-1]
 
-        month_transactions = self.return_transactions_between(month_start_day, month_end_day)
+        month_transactions = self.return_transactions_between(after=month_start_day, before=month_end_day)
 
         return month_transactions
 
@@ -186,21 +186,21 @@ class Transaction(db.Model):
                 byweekday.append(self.day_names[i])
         return byweekday
 
-    def return_transactions_between(self, start, end):
+    def return_transactions_between(self, before, after):
         """Returns all recurring transactions that
         occur between the start and end date
         """
-        start_datetime = datetime.combine(start, datetime.min.time())
-        end_datetime = datetime.combine(end, datetime.min.time())
+        before_datetime = datetime.combine(before, datetime.min.time())
+        after_datetime = datetime.combine(after, datetime.min.time())
 
         recurring_transactions = []
-        recurring_dates = self.recurring_dates.between(before=start_datetime, after=end_datetime, inc=True)
+        recurring_dates = self.recurring_dates.between(before=before_datetime, after=after_datetime, inc=True)
         for date in recurring_dates:
             transaction = Transaction(
                 id = self.id,
                 user_id = self.user_id,
                 title = self.title, 
-                date = date,
+                date = date.date(),
                 amount = self.amount,
                 income = self.income,
             )

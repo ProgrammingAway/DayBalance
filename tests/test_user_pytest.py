@@ -146,6 +146,7 @@ def test_month_transactions(db_one_user):
     )
 
     month_transactions = user1.month_transactions(2021, 6)
+    assert len(month_transactions) == 4
     for transaction in month_transactions:
         if transaction.date in [ date(2021, 6, 5), date(2021, 6, 12), date(2021, 6, 22), date(2021, 6, 6) ]:
             assert True
@@ -153,6 +154,7 @@ def test_month_transactions(db_one_user):
             assert transaction.date == False
 
     month_transactions = user1.month_transactions(2021, 7)
+    assert len(month_transactions) == 2
     for transaction in month_transactions:
         if transaction.date in [ date(2021, 7, 4), date(2021, 7, 6) ]:
             assert True

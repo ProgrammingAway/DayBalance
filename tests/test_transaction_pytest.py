@@ -15,10 +15,16 @@ def test_form_validate(db_one_user):
     user1.start_date = date(2021, 3, 1)
     transaction1_form = TransactionForm(title="Bill1", date=date(2021, 2, 1), amount=100.00)
     assert transaction1_form.validate() == False
-    transaction2_form = TransactionForm(title="Bill2", date=date(2021, 3, 1), amount=200.00)
-    assert transaction2_form.validate() == True
-    transaction3_form = TransactionForm(title="Bill3", date=date(2021, 4, 1), amount=300.00)
+    #transaction2_form = TransactionForm(title="Bill2", date=date(2021, 3, 1), amount=200.00)
+    #assert transaction2_form.validate() == True
+    transaction3_form = TransactionForm(title="Bill3", date=date(2021, 4, 1), amount=300.00, until=date(2021, 10, 1))
     assert transaction3_form.validate() == True
+    transaction4_form = TransactionForm(title="Bill4", date=date(2021, 5, 1), amount=400.00, until=date(2021, 2, 15))
+    assert transaction4_form.validate() == False
+    transaction5_form = TransactionForm(title="Bill5", date=date(2021, 6, 1), amount=500.00, until=date(2021, 10, 1), count=3)
+    assert transaction4_form.validate() == False
+    transaction6_form = TransactionForm(title="Bill6", date=date(2021, 7, 1), amount=600.00, count=3)
+    assert transaction4_form.validate() == True
 
 def test_amount(db_one_user):
     db_one_user

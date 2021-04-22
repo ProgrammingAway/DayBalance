@@ -158,7 +158,7 @@ class Transaction(db.Model):
         byweekday_rrule = None
         for i in range(len(self.day_variables)):
             self.day_variables[i] = False
-        if byweekday is not None or len(byweekday) > 0:
+        if byweekday is not None and len(byweekday) > 0:
 #            weekday_num = self.date.weekday()
 #            self.day_variables[weekday_num] = True
 #        else:

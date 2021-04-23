@@ -188,8 +188,8 @@ class Transaction(app.db.Model):
             wkst=app.balance_calendar.firstweekday,
         ).__str__()
 
-        self.rrule_set = rruleset()
-        self.rrule_set.rrule(rrulestr(self.rrule_string))
+        self.rrule_set = dateutil.rrule.rruleset()
+        self.rrule_set.rrule(dateutil.rrule.rrulestr(self.rrule_string))
 
     def return_byweekday(self):
         byweekday = []

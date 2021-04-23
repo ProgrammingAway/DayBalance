@@ -1,24 +1,24 @@
-import logging
-from logging.handlers import SMTPHandler, RotatingFileHandler
 import os
-from flask import Flask, request, current_app
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from flask_mail import Mail
-from config import Config
-from calendar import Calendar
+import logging
+import logging.handlers
+import flask
+import flask_sqlalchemy
+import flask_migrate
+import flask_login
+import flask_mail
+import calendar
+import config
 
-db = SQLAlchemy()
-migrate = Migrate()
-login = LoginManager()
+db = flask_sqlalchemy.SQLAlchemy()
+migrate = flask_migrate.Migrate()
+login = flask_login.LoginManager()
 login.login_view = 'auth.login'
 login.login_message = 'Please log in to access this page.'
-mail = Mail()
-balance_calendar = Calendar()
+mail = flask_mail.Mail()
+balance_calendar = calendar.Calendar()
 
-def create_app(config_class=Config):
-    app = Flask(__name__)
+def create_app(config_class=config.Config):
+    app = flask.Flask(__name__)
     app.config.from_object(config_class)
 
     db.init_app(app)
@@ -49,7 +49,7 @@ def create_app(config_class=Config):
             secure = None
             if app.config['MAIL_USE_TLS']:
                 secure = ()
-            mail_handler = SMTPHandler(
+            mail_handler = logging.handlers.SMTPHandler(
                 mailhost=(app.config['MAIL_SERVER'], app.config['MAIL_PORT']),
                 fromaddr='no-reply@' + app.config['MAIL_SERVER'],
                 toaddrs=app.config['ADMINS'], subject='Microblog Failure',
@@ -64,8 +64,11 @@ def create_app(config_class=Config):
         else:
             if not os.path.exists('logs'):
                 os.mkdir('logs')
-            file_handler = RotatingFileHandler('logs/daybalance.log',
-                                               maxBytes=10240, backupCount=10)
+            file_handler = logging.handlers.RotatingFileHandler(
+                'logs/daybalance.log',
+                maxBytes=10240, 
+                backupCount=10,
+            )
             file_handler.setFormatter(logging.Formatter(
                 '%(asctime)s %(levelname)s: %(message)s '
                 '[in %(pathname)s:%(lineno)d]'))

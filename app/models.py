@@ -1,28 +1,26 @@
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask import current_app
-from flask_login import UserMixin
-from calendar import day_abbr, month_name
-from time import time
-from datetime import datetime
-from dateutil.rrule import YEARLY, MONTHLY, WEEKLY, DAILY
-from dateutil.rrule import SU, MO, TU, WE, TH, FR, SA
-from dateutil.rrule import rrule, rruleset, rrulestr
+import werkzeug.security
 import jwt
-from app import db, login, balance_calendar
+import time
+import flask
+import flask_login
+import calendar
+import dateutil.rrule
+import datetime
+import app
 
 
-@login.user_loader
+@app.login.user_loader
 def load_user(id):
     return User.query.get(int(id))
 
-class User(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
-    start_date = db.Column(db.Date, nullable=False)
-    start_balance = db.Column(db.Integer, nullable=False)
-    transactions = db.relationship(
+class User(flask_login.UserMixin, app.db.Model):
+    id = app.db.Column(app.db.Integer, primary_key=True)
+    username = app.db.Column(app.db.String(64), index=True, unique=True)
+    email = app.db.Column(app.db.String(120), index=True, unique=True)
+    password_hash = app.db.Column(app.db.String(128))
+    start_date = app.db.Column(app.db.Date, nullable=False)
+    start_balance = app.db.Column(app.db.Integer, nullable=False)
+    transactions = app.db.relationship(
         'Transaction',
         backref='user',
         lazy='dynamic',
@@ -35,15 +33,15 @@ class User(UserMixin, db.Model):
         self.start_balance = int(round(start_balance * 100))
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password_hash = werkzeug.security.generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
+        return werkzeug.security.check_password_hash(self.password_hash, password)
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
-            {'reset_password': self.id, 'exp': time() + expires_in},
-            current_app.config['SECRET_KEY'],
+            {'reset_password': self.id, 'exp': time.time() + expires_in},
+            flask.current_app.config['SECRET_KEY'],
             algorithm='HS256')
 #            algorithm='HS256').decode('utf-8')
 
@@ -52,7 +50,7 @@ class User(UserMixin, db.Model):
         try:
             id = jwt.decode(
                 token,
-                current_app.config['SECRET_KEY'],
+                flask.current_app.config['SECRET_KEY'],
                 algorithms=['HS256'],
             )['reset_password']
         except:
@@ -61,15 +59,15 @@ class User(UserMixin, db.Model):
 
     def weekday_headers(self):
         weekday_headers = []
-        for weekday in balance_calendar.iterweekdays():
-            weekday_headers.append(day_abbr[weekday])
+        for weekday in app.balance_calendar.iterweekdays():
+            weekday_headers.append(calendar.day_abbr[weekday])
         return weekday_headers
 
     def month_name(self, month):
-        return month_name[month]
+        return calendar.month_name[month]
 
     def month_days(self, year, month):
-        return balance_calendar.itermonthdates(year, month)
+        return app.balance_calendar.itermonthdates(year, month)
 
     def return_transactions_between(self, before, after):
         """This function adds all transactions (recurring and non-recurring)
@@ -101,7 +99,7 @@ class User(UserMixin, db.Model):
         that occurs for all dates between the budget start date and the
         first visible day of this calendar month.
         """
-        month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
+        month_start_day = list(app.balance_calendar.itermonthdates(year, month))[0]
         month_start_balance = 0
 
         prev_transactions = self.return_transactions_between(
@@ -120,8 +118,8 @@ class User(UserMixin, db.Model):
         """Returns all transactions (recurring and non-recurring) that
         occur durring all dates of the calendar that this month shows
         """
-        month_start_day = list(balance_calendar.itermonthdates(year, month))[0]
-        month_end_day = list(balance_calendar.itermonthdates(year, month))[-1]
+        month_start_day = list(app.balance_calendar.itermonthdates(year, month))[0]
+        month_end_day = list(app.balance_calendar.itermonthdates(year, month))[-1]
 
         month_transactions = self.return_transactions_between(
             after=month_start_day,
@@ -131,35 +129,35 @@ class User(UserMixin, db.Model):
         return month_transactions
 
 
-class Transaction(db.Model):
+class Transaction(app.db.Model):
     # Inputs for database
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(40), nullable=False)
-    date = db.Column(db.Date, nullable=False)
-    amount = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(200))
-    income = db.Column(db.Boolean)
-    is_recurring = db.Column(db.Boolean)
-    freq = db.Column(db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
-    interval = db.Column(db.Integer)
-    mon = db.Column(db.Boolean)
-    tue = db.Column(db.Boolean)
-    wed = db.Column(db.Boolean)
-    thu = db.Column(db.Boolean)
-    fri = db.Column(db.Boolean)
-    sat = db.Column(db.Boolean)
-    sun = db.Column(db.Boolean)
+    id = app.db.Column(app.db.Integer, primary_key=True)
+    title = app.db.Column(app.db.String(40), nullable=False)
+    date = app.db.Column(app.db.Date, nullable=False)
+    amount = app.db.Column(app.db.Integer, nullable=False)
+    description = app.db.Column(app.db.String(200))
+    income = app.db.Column(app.db.Boolean)
+    is_recurring = app.db.Column(app.db.Boolean)
+    freq = app.db.Column(app.db.String(8))  # DAILY, WEEKLY, MONTHLY, YEARLY
+    interval = app.db.Column(app.db.Integer)
+    mon = app.db.Column(app.db.Boolean)
+    tue = app.db.Column(app.db.Boolean)
+    wed = app.db.Column(app.db.Boolean)
+    thu = app.db.Column(app.db.Boolean)
+    fri = app.db.Column(app.db.Boolean)
+    sat = app.db.Column(app.db.Boolean)
+    sun = app.db.Column(app.db.Boolean)
     # count and until cannot be used together
-    count = db.Column(db.Integer)  # number of occurrences
-    until = db.Column(db.Date)     # recurrence end date
-    rrule_string = db.Column(db.String(100))
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    count = app.db.Column(app.db.Integer)  # number of occurrences
+    until = app.db.Column(app.db.Date)     # recurrence end date
+    rrule_string = app.db.Column(app.db.String(100))
+    user_id = app.db.Column(app.db.Integer, app.db.ForeignKey('user.id'), nullable=False)
 
     # Other variables
     day_names = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
     day_variables = [ mon, tue, wed, thu, fri, sat, sun ]
-    freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
-    rrule_set = rruleset()
+    freq_values =  {'DAILY':dateutil.rrule.DAILY, 'WEEKLY':dateutil.rrule.WEEKLY, 'MONTHLY':dateutil.rrule.MONTHLY, 'YEARLY':dateutil.rrule.YEARLY}
+    rrule_set = dateutil.rrule.rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -179,15 +177,15 @@ class Transaction(db.Model):
             for weekday in byweekday:
                 self.day_variables[self.day_names.index(weekday)] = True
                 byweekday_rrule.append(self.day_names.index(weekday))
-        
-        self.rrule_string = rrule(
+
+        self.rrule_string = dateutil.rrule.rrule(
             freq=self.freq_values[str(self.freq)],
             dtstart=self.date,
             interval=self.interval,
             count=self.count,
             until=self.until,
             byweekday=byweekday_rrule,
-            wkst=balance_calendar.firstweekday,
+            wkst=app.balance_calendar.firstweekday,
         ).__str__()
 
         self.rrule_set = rruleset()
@@ -204,10 +202,10 @@ class Transaction(db.Model):
         """Returns all recurring transactions that
         occur between the start and end date
         """
-        before_datetime = datetime.combine(before, datetime.min.time())
-        after_datetime = datetime.combine(after, datetime.min.time())
+        before_datetime = datetime.datetime.combine(before, datetime.datetime.min.time())
+        after_datetime = datetime.datetime.combine(after,datetime.datetime.min.time())
 
-        #recurring_dates = rrulestr(self.rrule_string).between( # TZID error
+        #recurring_dates = dateutil.rrule.rrulestr(self.rrule_string).between( # TZID error
         recurring_dates = self.rrule_set.between(
             before=before_datetime,
             after=after_datetime,

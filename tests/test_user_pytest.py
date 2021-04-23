@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 from app import db
 from app.models import User, Transaction
+#from .context.app import db
+#from .context.app.models import User, Transaction
 from datetime import datetime, date
 import pytest
 

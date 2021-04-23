@@ -26,8 +26,8 @@ class TestConfigSun(config.Config):
 
 @pytest.fixture(scope="function")
 def setup_db():
-    app = app.create_app(TestConfig)
-    app_context = app.app_context()
+    new_app = app.create_app(TestConfig)
+    app_context = new_app.app_context()
     app_context.push()
     app.db.create_all()
     yield
@@ -38,8 +38,8 @@ def setup_db():
 
 @pytest.fixture(scope="function")
 def setup_db_sun():
-    app = create_app(TestConfigSun)
-    app_context = app.app_context()
+    new_app = create_app(TestConfigSun)
+    app_context = new_app.app_context()
     app_context.push()
     app.db.create_all()
     yield

@@ -48,14 +48,14 @@ def test_set_recurring(db_one_user):
         count=3,
     )
     t.set_recurring(["TH"])
-    assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
     assert ["TH"] == t.return_byweekday()
+    assert t.rrule_string == 'DTSTART:20210401T000000\nRRULE:FREQ=WEEKLY;COUNT=3;BYDAY=TH'
     t.set_recurring(["FR", "TU"])
-    assert list(t.recurring_dates) == [datetime(2021, 4, 2), datetime(2021, 4, 6), datetime(2021, 4, 9)]
     assert ["TU", "FR"] == t.return_byweekday()
+    assert t.rrule_string == 'DTSTART:20210401T000000\nRRULE:FREQ=WEEKLY;COUNT=3;BYDAY=TU,FR'
     t.set_recurring(None)
-    assert list(t.recurring_dates) == [datetime(2021, 4, 1), datetime(2021, 4, 8), datetime(2021, 4, 15)]
     assert [] == t.return_byweekday()
+    assert t.rrule_string == 'DTSTART:20210401T000000\nRRULE:FREQ=WEEKLY;COUNT=3'
 
 def test_return_transactions_between(db_one_user):
     db_one_user

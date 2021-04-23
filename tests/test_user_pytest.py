@@ -109,7 +109,6 @@ def test_month_starting_balance(db_one_user):
     )
 
     july_start_balance = 0 - (5 * t5.amount) # recurring transactions
-    #july_start_balance = 0
     for transaction in [t1, t2, t3]:
         if transaction.income:
             july_start_balance = july_start_balance + transaction.amount
@@ -119,7 +118,6 @@ def test_month_starting_balance(db_one_user):
     assert (july_start_balance / 100) == user1.month_starting_balance(2021, 7)
 
     august_start_balance = july_start_balance - t5.amount
-    #august_start_balance = july_start_balance
     for transaction in [t4]:
         if transaction.income:
             august_start_balance = august_start_balance + transaction.amount

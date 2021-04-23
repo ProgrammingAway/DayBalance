@@ -4,7 +4,7 @@ import time
 import flask
 import flask_login
 import calendar
-import dateutil.rrule
+import dateutil.rrule as rrule
 import datetime
 import app
 
@@ -156,8 +156,8 @@ class Transaction(app.db.Model):
     # Other variables
     day_names = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
     day_variables = [ mon, tue, wed, thu, fri, sat, sun ]
-    freq_values =  {'DAILY':dateutil.rrule.DAILY, 'WEEKLY':dateutil.rrule.WEEKLY, 'MONTHLY':dateutil.rrule.MONTHLY, 'YEARLY':dateutil.rrule.YEARLY}
-    rrule_set = dateutil.rrule.rruleset()
+    freq_values =  {'DAILY':rrule.DAILY, 'WEEKLY':rrule.WEEKLY, 'MONTHLY':rrule.MONTHLY, 'YEARLY':rrule.YEARLY}
+    rrule_set = rrule.rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -178,7 +178,7 @@ class Transaction(app.db.Model):
                 self.day_variables[self.day_names.index(weekday)] = True
                 byweekday_rrule.append(self.day_names.index(weekday))
 
-        self.rrule_string = dateutil.rrule.rrule(
+        self.rrule_string = rrule.rrule(
             freq=self.freq_values[str(self.freq)],
             dtstart=self.date,
             interval=self.interval,
@@ -188,8 +188,8 @@ class Transaction(app.db.Model):
             wkst=app.balance_calendar.firstweekday,
         ).__str__()
 
-        self.rrule_set = dateutil.rrule.rruleset()
-        self.rrule_set.rrule(dateutil.rrule.rrulestr(self.rrule_string))
+        self.rrule_set = rrule.rruleset()
+        self.rrule_set.rrule(rrule.rrulestr(self.rrule_string))
 
     def return_byweekday(self):
         byweekday = []
@@ -205,7 +205,7 @@ class Transaction(app.db.Model):
         before_datetime = datetime.datetime.combine(before, datetime.datetime.min.time())
         after_datetime = datetime.datetime.combine(after,datetime.datetime.min.time())
 
-        #recurring_dates = dateutil.rrule.rrulestr(self.rrule_string).between( # TZID error
+        #recurring_dates = rrule.rrulestr(self.rrule_string).between( # TZID error
         recurring_dates = self.rrule_set.between(
             before=before_datetime,
             after=after_datetime,

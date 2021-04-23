@@ -1,5 +1,5 @@
-from flask import Blueprint
+import flask
 
-bp = Blueprint('errors', __name__)
+bp = flask.Blueprint('errors', __name__)
 
 from app.errors import handlers

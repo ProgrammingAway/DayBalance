@@ -1,10 +1,10 @@
-import werkzeug
+import werkzeug.security
 import jwt
 import time
 import flask
 import flask_login
 import calendar
-import dateutil
+import dateutil.rrule
 import datetime
 import app
 

@@ -1,6 +1,8 @@
-from wtforms import Form, DecimalField, IntegerField, SubmitField, TextAreaField
-from wtforms import StringField, BooleanField, SelectField, SelectMultipleField
-from wtforms.validators import InputRequired, Length, ValidationError, NumberRange, Optional
+from wtforms import Form, DecimalField, IntegerField, SubmitField
+from wtforms import TextAreaField, StringField, BooleanField
+from wtforms import SelectField, SelectMultipleField
+from wtforms.validators import InputRequired, Length, ValidationError
+from wtforms.validators import NumberRange, Optional
 from wtforms.fields.html5 import DateField
 from app.models import User
 from flask_login import current_user

@@ -78,7 +78,7 @@ def db_two_users(db_one_user):
     u = app.models.User(username='Oreo')
     u.set_password('password2')
     u.email = 'oreo@email.com'
-    u.start_date = date(2021, 2, 1)
+    u.start_date = datetime.date(2021, 2, 1)
     u.set_start_balance(6543.21)
     app.db.session.add(u)
     app.db.session.commit()

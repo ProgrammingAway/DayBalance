@@ -84,6 +84,8 @@
                 <div class="transactions">
                     {% for transaction in transactions %}
                         {% if transaction.date.month == day.month and transaction.date.day == day.day and transaction.date.year == day.year %}
+                        <!-- amounts are stored as integers, so /100 to get into money format -->
+                        {% set transaction_amount = transaction.amount/100 %}
                             <div
                                 {% if transaction.income != True %}
                                     class="row no-gutters transaction transaction-red"
@@ -97,11 +99,11 @@
                                 </div>
                                 <div class="col">
                                 <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id) }}">
-                                    {{ "$%.2f"|format(transaction.amount) }}
+                                    {{ "$%.2f"|format(transaction_amount) }}
                                 </a>
                                 </div>
                             </div>
-                            {% set ns.curr_balance = (ns.curr_balance + transaction.amount) if transaction.income == True else (ns.curr_balance - transaction.amount) %}
+                            {% set ns.curr_balance = (ns.curr_balance + transaction_amount) if transaction.income == True else (ns.curr_balance - transaction_amount) %}
                         {% endif %}
                     {% endfor %}
                 </div>

@@ -159,6 +159,7 @@ class Transaction(db.Model):
     day_names = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
     day_variables = [ mon, tue, wed, thu, fri, sat, sun ]
     freq_values =  {'DAILY':DAILY, 'WEEKLY':WEEKLY, 'MONTHLY':MONTHLY, 'YEARLY':YEARLY}
+    rrule_set = rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -178,7 +179,7 @@ class Transaction(db.Model):
             for weekday in byweekday:
                 self.day_variables[self.day_names.index(weekday)] = True
                 byweekday_rrule.append(self.day_names.index(weekday))
-
+        
         self.rrule_string = rrule(
             freq=self.freq_values[str(self.freq)],
             dtstart=self.date,
@@ -188,6 +189,9 @@ class Transaction(db.Model):
             byweekday=byweekday_rrule,
             wkst=balance_calendar.firstweekday,
         ).__str__()
+
+        self.rrule_set = rruleset()
+        self.rrule_set.rrule(rrulestr(self.rrule_string))
 
     def return_byweekday(self):
         byweekday = []
@@ -203,7 +207,8 @@ class Transaction(db.Model):
         before_datetime = datetime.combine(before, datetime.min.time())
         after_datetime = datetime.combine(after, datetime.min.time())
 
-        recurring_dates = rrulestr(self.rrule_string).between(
+        #recurring_dates = rrulestr(self.rrule_string).between( # TZID error
+        recurring_dates = self.rrule_set.between(
             before=before_datetime,
             after=after_datetime,
             inc=True,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
-from .context.app import create_app, db
-from .context.app.models import User, Transaction
-from .context.config import Config
+from app import create_app, db
+from app.models import User, Transaction
+from config import Config
 from datetime import datetime, date
 import pytest
 

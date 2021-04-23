@@ -38,7 +38,7 @@ def setup_db():
 
 @pytest.fixture(scope="function")
 def setup_db_sun():
-    new_app = create_app(TestConfigSun)
+    new_app = app.create_app(TestConfigSun)
     app_context = new_app.app_context()
     app_context.push()
     app.db.create_all()

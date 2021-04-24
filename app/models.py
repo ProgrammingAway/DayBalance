@@ -89,7 +89,9 @@ class User(flask_login.UserMixin, app.db.Model):
         )
 
         for recurring_transaction in recurring_transactions:
-            recurring_dates = (recurring_transaction.return_transactions_between(before=before, after=after))
+            recurring_dates = (
+                recurring_transaction.return_transactions_between(
+                    before=before, after=after))
             transactions.extend(recurring_dates)
 
         return transactions
@@ -100,7 +102,8 @@ class User(flask_login.UserMixin, app.db.Model):
         that occurs for all dates between the budget start date and the
         first visible day of this calendar month.
         """
-        month_start_day = list(app.balance_calendar.itermonthdates(year, month))[0]
+        month_start_day = list(
+            app.balance_calendar.itermonthdates(year, month))[0]
         month_start_balance = 0
 
         prev_transactions = self.return_transactions_between(
@@ -119,8 +122,10 @@ class User(flask_login.UserMixin, app.db.Model):
         """Returns all transactions (recurring and non-recurring) that
         occur durring all dates of the calendar that this month shows
         """
-        month_start_day = list(app.balance_calendar.itermonthdates(year, month))[0]
-        month_end_day = list(app.balance_calendar.itermonthdates(year, month))[-1]
+        month_start_day = list(
+            app.balance_calendar.itermonthdates(year, month))[0]
+        month_end_day = list(
+            app.balance_calendar.itermonthdates(year, month))[-1]
 
         month_transactions = self.return_transactions_between(
             after=month_start_day,

@@ -63,7 +63,11 @@ def add_transaction():
         db.session.commit()
 
         flash("Transaction Added")
-        return redirect(url_for("main.index"))
+        return redirect(url_for(
+            "main.index",
+            year=transaction.date.year,
+            month=transaction.date.month,
+        ))
     return render_template(
         "transaction.html",
         title = "Add Transaction",
@@ -91,7 +95,11 @@ def edit_transaction(transaction_id):
             edited_transaction.set_recurring(form.byweekday.data)
         db.session.commit()
         flash("Your changes have been saved.")
-        return redirect(url_for("main.index"))
+        return redirect(url_for(
+            "main.index",
+            year=edited_transaction.date.year,
+            month=edited_transaction.date.month,
+        ))
     elif request.method == 'GET':
         form.title.data = edited_transaction.title
         form.date.data = edited_transaction.date
@@ -118,9 +126,15 @@ def edit_transaction(transaction_id):
 @login_required
 def delete_transaction(transaction_id):
     delete_transaction = Transaction.query.filter_by(id=transaction_id).one()
+    year = delete_transaction.date.year
+    month = delete_transaction.date.month
     db.session.delete(delete_transaction)
     db.session.commit()
 
     # Redirect user to home page
     flash("Transaction Deleted")
-    return redirect(url_for("main.index"))
+    return redirect(url_for(
+        "main.index",
+        year=year,
+        month=month,
+    ))

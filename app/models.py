@@ -157,6 +157,11 @@ class Transaction(app.db.Model):
     count = app.db.Column(app.db.Integer)  # number of occurrences
     until = app.db.Column(app.db.Date)     # recurrence end date
     rrule_string = app.db.Column(app.db.String(100))
+    transaction_exceptions = app.db.relationship(
+        'TransactionException',
+        backref='transaction',
+        lazy='dynamic',
+    )
     user_id = app.db.Column(
         app.db.Integer,
         app.db.ForeignKey('user.id'),
@@ -218,7 +223,15 @@ class Transaction(app.db.Model):
         after_datetime = datetime.datetime.combine(
             after, datetime.datetime.min.time())
 
-        recurring_dates = rrule.rrulestr(self.rrule_string).between(
+        recurring_set = rrule.rruleset()
+        recurring_set.rrule(rrule.rrulestr(self.rrule_string))
+        for exception in self.transaction_exceptions:
+            if exception.delete is False:
+                recurring_set.rdate(exception.date)
+            else:
+                recurring_Set.exdate(exception.date)
+
+        recurring_dates = recurring_set.between(
             before=before_datetime,
             after=after_datetime,
             inc=True,
@@ -237,3 +250,14 @@ class Transaction(app.db.Model):
             recurring_transactions.append(transaction)
 
         return recurring_transactions
+
+
+class TransactionException(app.db.Model):
+    id = app.db.Column(app.db.Integer, primary_key=True)
+    date = app.db.Column(app.db.Date, nullable=False)
+    delete = app.db.Column(app.db.Boolean)
+    transaction_id = app.db.Column(
+        app.db.Integer,
+        app.db.ForeignKey('transaction.id'),
+        nullable=False,
+    )

@@ -78,14 +78,14 @@ class User(flask_login.UserMixin, app.db.Model):
         """
         transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
-            Transaction.is_recurring is False,
+            Transaction.is_recurring == False,
             Transaction.date >= after,
             Transaction.date < before,
         ).all()
 
         recurring_transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
-            Transaction.is_recurring is True,
+            Transaction.is_recurring == True,
         )
 
         for recurring_transaction in recurring_transactions:
@@ -109,10 +109,10 @@ class User(flask_login.UserMixin, app.db.Model):
         )
 
         for transaction in prev_transactions:
-            if transaction.income is True:
-                month_start_balance = month_start_balance + transaction.amount
-            else:
+            if transaction.income is False:
                 month_start_balance = month_start_balance - transaction.amount
+            else:
+                month_start_balance = month_start_balance + transaction.amount
         return (month_start_balance / 100)
 
     def month_transactions(self, year, month):

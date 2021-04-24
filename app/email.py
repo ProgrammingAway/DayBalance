@@ -20,5 +20,7 @@ def send_email(subject, sender, recipients, text_body, html_body,
     if sync:
         app.mail.send(msg)
     else:
-        threading.Thread(target=send_async_email,
-            args=(flask.current_app._get_current_object(), msg)).start()
+        threading.Thread(
+            target=send_async_email,
+            args=(flask.current_app._get_current_object(), msg),
+        ).start()

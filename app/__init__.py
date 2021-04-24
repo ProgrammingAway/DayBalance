@@ -17,6 +17,7 @@ login.login_message = 'Please log in to access this page.'
 mail = flask_mail.Mail()
 balance_calendar = calendar.Calendar()
 
+
 def create_app(config_class=config.Config):
     app = flask.Flask(__name__)
     app.config.from_object(config_class)
@@ -66,7 +67,7 @@ def create_app(config_class=config.Config):
                 os.mkdir('logs')
             file_handler = logging.handlers.RotatingFileHandler(
                 'logs/daybalance.log',
-                maxBytes=10240, 
+                maxBytes=10240,
                 backupCount=10,
             )
             file_handler.setFormatter(logging.Formatter(
@@ -79,5 +80,6 @@ def create_app(config_class=config.Config):
         app.logger.info('DayBalance startup')
 
     return app
+
 
 from app import models

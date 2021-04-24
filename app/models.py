@@ -229,7 +229,7 @@ class Transaction(app.db.Model):
             if exception.delete is False:
                 recurring_set.rdate(exception.date)
             else:
-                recurring_Set.exdate(exception.date)
+                recurring_set.exdate(exception.date)
 
         recurring_dates = recurring_set.between(
             before=before_datetime,

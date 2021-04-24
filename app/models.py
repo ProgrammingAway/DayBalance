@@ -13,6 +13,7 @@ import app
 def load_user(id):
     return User.query.get(int(id))
 
+
 class User(flask_login.UserMixin, app.db.Model):
     id = app.db.Column(app.db.Integer, primary_key=True)
     username = app.db.Column(app.db.String(64), index=True, unique=True)
@@ -36,7 +37,8 @@ class User(flask_login.UserMixin, app.db.Model):
         self.password_hash = werkzeug.security.generate_password_hash(password)
 
     def check_password(self, password):
-        return werkzeug.security.check_password_hash(self.password_hash, password)
+        return werkzeug.security.check_password_hash(
+            self.password_hash, password)
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(
@@ -53,7 +55,7 @@ class User(flask_login.UserMixin, app.db.Model):
                 flask.current_app.config['SECRET_KEY'],
                 algorithms=['HS256'],
             )['reset_password']
-        except:
+        except Exception:
             return
         return User.query.get(id)
 
@@ -76,22 +78,21 @@ class User(flask_login.UserMixin, app.db.Model):
         """
         transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
-            Transaction.is_recurring == False,
+            Transaction.is_recurring is False,
             Transaction.date >= after,
             Transaction.date < before,
         ).all()
 
         recurring_transactions = Transaction.query.filter(
             Transaction.user_id == self.id,
-            Transaction.is_recurring == True,
+            Transaction.is_recurring is True,
         )
 
         for recurring_transaction in recurring_transactions:
-            recurring_dates = recurring_transaction.return_transactions_between(before=before, after=after)
+            recurring_dates = (recurring_transaction.return_transactions_between(before=before, after=after))
             transactions.extend(recurring_dates)
 
         return transactions
-
 
     def month_starting_balance(self, year, month):
         """Returns the starting balance for the current month.
@@ -108,7 +109,7 @@ class User(flask_login.UserMixin, app.db.Model):
         )
 
         for transaction in prev_transactions:
-            if transaction.income == True:
+            if transaction.income is True:
                 month_start_balance = month_start_balance + transaction.amount
             else:
                 month_start_balance = month_start_balance - transaction.amount
@@ -151,12 +152,21 @@ class Transaction(app.db.Model):
     count = app.db.Column(app.db.Integer)  # number of occurrences
     until = app.db.Column(app.db.Date)     # recurrence end date
     rrule_string = app.db.Column(app.db.String(100))
-    user_id = app.db.Column(app.db.Integer, app.db.ForeignKey('user.id'), nullable=False)
+    user_id = app.db.Column(
+        app.db.Integer,
+        app.db.ForeignKey('user.id'),
+        nullable=False,
+    )
 
     # Other variables
     day_names = ['MO', 'TU', 'WE', 'TH', 'FR', 'SA', 'SU']
-    day_variables = [ mon, tue, wed, thu, fri, sat, sun ]
-    freq_values =  {'DAILY':rrule.DAILY, 'WEEKLY':rrule.WEEKLY, 'MONTHLY':rrule.MONTHLY, 'YEARLY':rrule.YEARLY}
+    day_variables = [mon, tue, wed, thu, fri, sat, sun]
+    freq_values = {
+        'DAILY': rrule.DAILY,
+        'WEEKLY': rrule.WEEKLY,
+        'MONTHLY': rrule.MONTHLY,
+        'YEARLY': rrule.YEARLY,
+    }
     rrule_set = rrule.rruleset()
 
     def __repr__(self):
@@ -202,10 +212,13 @@ class Transaction(app.db.Model):
         """Returns all recurring transactions that
         occur between the start and end date
         """
-        before_datetime = datetime.datetime.combine(before, datetime.datetime.min.time())
-        after_datetime = datetime.datetime.combine(after,datetime.datetime.min.time())
+        before_datetime = datetime.datetime.combine(
+            before, datetime.datetime.min.time())
+        after_datetime = datetime.datetime.combine(
+            after, datetime.datetime.min.time())
 
-        #recurring_dates = rrule.rrulestr(self.rrule_string).between( # TZID error
+        # TZID error
+        # recurring_dates = rrule.rrulestr(self.rrule_string).between(
         recurring_dates = self.rrule_set.between(
             before=before_datetime,
             after=after_datetime,
@@ -215,12 +228,12 @@ class Transaction(app.db.Model):
         recurring_transactions = []
         for date in recurring_dates:
             transaction = Transaction(
-                id = self.id,
-                user_id = self.user_id,
-                title = self.title, 
-                date = date.date(),
-                amount = self.amount,
-                income = self.income,
+                id=self.id,
+                user_id=self.user_id,
+                title=self.title,
+                date=date.date(),
+                amount=self.amount,
+                income=self.income,
             )
             recurring_transactions.append(transaction)
 

@@ -71,7 +71,6 @@ def add_transaction():
     )
 
 
-@bp.route("/edit", methods=["GET", "POST"])
 @bp.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
 @login_required
 def edit_transaction(transaction_id):

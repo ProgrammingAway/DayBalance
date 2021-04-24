@@ -172,7 +172,6 @@ class Transaction(app.db.Model):
         'MONTHLY': rrule.MONTHLY,
         'YEARLY': rrule.YEARLY,
     }
-    rrule_set = rrule.rruleset()
 
     def __repr__(self):
         return '<Transaction {}>'.format(self.title)
@@ -203,9 +202,6 @@ class Transaction(app.db.Model):
             wkst=app.balance_calendar.firstweekday,
         ).__str__()
 
-        self.rrule_set = rrule.rruleset()
-        self.rrule_set.rrule(rrule.rrulestr(self.rrule_string))
-
     def return_byweekday(self):
         byweekday = []
         for i in range(len(self.day_variables)):
@@ -222,9 +218,7 @@ class Transaction(app.db.Model):
         after_datetime = datetime.datetime.combine(
             after, datetime.datetime.min.time())
 
-        # TZID error
-        # recurring_dates = rrule.rrulestr(self.rrule_string).between(
-        recurring_dates = self.rrule_set.between(
+        recurring_dates = rrule.rrulestr(self.rrule_string).between(
             before=before_datetime,
             after=after_datetime,
             inc=True,

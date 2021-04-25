@@ -105,7 +105,7 @@ def edit_transaction(transaction_id, date_format):
             added_transaction.user_id = current_user.id
             db.session.add(added_transaction)
             removed_transaction = TransactionException(
-                date = form.date.data,
+                date = current_date,
                 delete = True,
                 transaction_id = edited_transaction.id,
                 user_id = current_user.id,
@@ -129,7 +129,7 @@ def edit_transaction(transaction_id, date_format):
             added_transaction.set_recurring(form.byweekday.data)
             db.session.add(added_transaction)
             edited_transaction.count = None
-            edited_transaction.until = form.date.data - timedelta(days=1)
+            edited_transaction.until = current_date - timedelta(days=1)
             edited_transaction.set_recurring(form.byweekday.data)
         else:
             edited_transaction.count = form.count.data
@@ -148,8 +148,8 @@ def edit_transaction(transaction_id, date_format):
         flash("Your changes have been saved.")
         return redirect(url_for(
             "main.index",
-            year=edited_transaction.date.year,
-            month=edited_transaction.date.month,
+            year=form.date.data.year,
+            month=form.date.data.month,
         ))
     elif request.method == 'GET':
         form.title.data = edited_transaction.title

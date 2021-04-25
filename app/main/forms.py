@@ -1,6 +1,6 @@
 from wtforms import Form, DecimalField, IntegerField, SubmitField
 from wtforms import TextAreaField, StringField, BooleanField
-from wtforms import SelectField, SelectMultipleField
+from wtforms import SelectField, SelectMultipleField, RadioField
 from wtforms.validators import InputRequired, Length, ValidationError
 from wtforms.validators import NumberRange, Optional
 from wtforms.fields.html5 import DateField
@@ -55,6 +55,16 @@ class TransactionForm(Form):
         validators=[NumberRange(min=1, max=100), Optional()],
     )
     until = DateField('End Date', validators=[Optional()])
+    change = RadioField(
+        'Change',
+        choices=[
+            ('current', 'Current transaction'),
+            ('all', 'All transactions in the series'),
+            ('after', 'All following transactions'),
+        ],
+        validators=[Optional()],
+    )
+
     submit = SubmitField('Submit')
 
     def validate_date(self, date):

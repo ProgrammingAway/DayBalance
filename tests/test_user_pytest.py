@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from app import db
-from app.models import User, Transaction
+from app.models import User, Transaction, TransactionException
 #from .context.app import db
 #from .context.app.models import User, Transaction
 from datetime import datetime, date
@@ -36,6 +36,22 @@ def create_test_transaction(
     db.session.add(t)
     db.session.commit()
     return Transaction.query.filter_by(id=t.id).first()
+
+def create_test_exception(
+    transaction_id,
+    user_id,
+    date=datetime.now(),
+    delete=False,
+):
+    e = TransactionException(
+        user_id=user_id,
+        date=date,
+        delete=delete,
+        transaction_id=transaction_id,
+    )
+    db.session.add(e)
+    db.session.commit()
+    return TransactionException.query.filter_by(id=e.id).first()
 
 def test_password_hashing(db_one_user):
     db_one_user

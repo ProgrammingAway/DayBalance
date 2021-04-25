@@ -6,7 +6,7 @@ from config import Config
 from datetime import datetime, date
 from dateutil.rrule import YEARLY, MONTHLY, WEEKLY, DAILY, SU, MO, TU, WE, TH, FR, SA
 import pytest
-from test_user_pytest import create_test_transaction
+from test_user_pytest import create_test_transaction, create_test_exception
 
 
 def test_form_validate(db_one_user):
@@ -76,6 +76,20 @@ def test_return_transactions_between(db_one_user):
         else:
             assert transaction.date == False
 
+    e1 = create_test_exception(
+        user_id=user1.id, 
+        transaction_id=t1.id,
+        date=date(2021, 4, 8), 
+        delete=True, 
+    )
+    recurring_transactions2 = t1.return_transactions_between(before=date(2021, 5, 1), after=date(2021, 4, 1))
+    for transaction in recurring_transactions2:
+        assert transaction.title == t1.title
+        if transaction.date in [ date(2021, 4, 1), date(2021, 4, 15) ]:
+            assert True
+        else:
+            assert transaction.date == False
+
     t2 = create_test_transaction(
         user_id=user1.id,
         title="Another Recurring Bill",
@@ -84,10 +98,30 @@ def test_return_transactions_between(db_one_user):
         freq="MONTHLY", 
         interval=1, 
     )
-    recurring_transactions2 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
-    for transaction in recurring_transactions2:
+    recurring_transactions3 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
+    for transaction in recurring_transactions3:
         assert transaction.title == t2.title
         if transaction.date in [ date(2021, 5, 5), date(2021, 6, 5), date(2021, 7, 5) ]:
+            assert True
+        else:
+            assert transaction.date == False
+
+    e2 = create_test_exception(
+        user_id=user1.id, 
+        transaction_id=t2.id,
+        date=date(2021, 6, 5), 
+        delete=True, 
+    )
+    e3 = create_test_exception(
+        user_id=user1.id, 
+        transaction_id=t2.id,
+        date=date(2021, 5, 28), 
+        delete=False, 
+    )
+    recurring_transactions4 = t2.return_transactions_between(before=date(2021, 8, 1), after=date(2021, 5, 1))
+    for transaction in recurring_transactions4:
+        assert transaction.title == t2.title
+        if transaction.date in [ date(2021, 5, 5), date(2021, 5, 28), date(2021, 7, 5) ]:
             assert True
         else:
             assert transaction.date == False

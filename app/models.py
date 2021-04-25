@@ -227,9 +227,13 @@ class Transaction(app.db.Model):
         recurring_set.rrule(rrule.rrulestr(self.rrule_string))
         for exception in self.transaction_exceptions:
             if exception.delete is False:
-                recurring_set.rdate(exception.date)
+                recurring_set.rdate(datetime.datetime.combine(
+                    exception.date,
+                    datetime.datetime.min.time()))
             else:
-                recurring_set.exdate(exception.date)
+                recurring_set.exdate(datetime.datetime.combine(
+                    exception.date,
+                    datetime.datetime.min.time()))
 
         recurring_dates = recurring_set.between(
             before=before_datetime,
@@ -259,5 +263,10 @@ class TransactionException(app.db.Model):
     transaction_id = app.db.Column(
         app.db.Integer,
         app.db.ForeignKey('transaction.id'),
+        nullable=False,
+    )
+    user_id = app.db.Column(
+        app.db.Integer,
+        app.db.ForeignKey('user.id'),
         nullable=False,
     )

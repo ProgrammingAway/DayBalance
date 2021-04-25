@@ -1,9 +1,9 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_required
 from app import db
 from app.main.forms import TransactionForm
-from app.models import User, Transaction
+from app.models import User, Transaction, TransactionException
 from app.main import bp
 
 
@@ -75,24 +75,75 @@ def add_transaction():
     )
 
 
-@bp.route("/edit/<int:transaction_id>", methods=["GET", "POST"])
+@bp.route("/edit/<int:transaction_id>/<int:date_format>", methods=["GET", "POST"])
 @login_required
-def edit_transaction(transaction_id):
+def edit_transaction(transaction_id, date_format):
     form = TransactionForm(request.form)
     edited_transaction = Transaction.query.filter_by(id=transaction_id).one()
+    current_date = datetime.strptime(str(date_format),'%Y%m%d').date()        
     if request.method == 'POST' and form.validate():
-        edited_transaction.title = form.title.data
-        edited_transaction.date = form.date.data
-        edited_transaction.description = form.description.data
-        edited_transaction.income = form.income.data
-        edited_transaction.is_recurring = form.is_recurring.data
-        edited_transaction.freq = form.freq.data
-        edited_transaction.interval = form.interval.data
-        edited_transaction.count = form.count.data
-        edited_transaction.until = form.until.data
-        edited_transaction.set_amount(form.amount.data)
-        if form.is_recurring.data:
+        if form.is_recurring.data and form.change.data == 'current':
+            if form.amount.data != edited_transaction.amount:
+                added_transaction = Transaction(
+                    title = form.title.data, 
+                    description = form.description.data,
+                    income = form.income.data,
+                    is_recurring = False,
+                    freq = form.freq.data,
+                    interval = form.interval.data,
+                    count = form.count.data,
+                    until = form.until.data,
+                )
+                added_transaction.set_amount(form.amount.data)
+                added_transaction.set_recurring(form.byweekday.data)
+            else:
+                added_transaction = TransactionException(
+                    delete = False,
+                    transaction_id = edited_transaction.id,
+                )
+            added_transaction.date = form.date.data
+            added_transaction.user_id = current_user.id
+            db.session.add(added_transaction)
+            removed_transaction = TransactionException(
+                date = form.date.data,
+                delete = True,
+                transaction_id = edited_transaction.id,
+                user_id = current_user.id,
+            )
+            db.session.add(removed_transaction)
+        elif form.is_recurring.data and form.change.data == 'after':
+            # create new recurring transaction and add until to this one
+            added_transaction = Transaction(
+                user_id = current_user.id,
+                title = form.title.data, 
+                date = form.date.data,
+                description = form.description.data,
+                income = form.income.data,
+                is_recurring = form.is_recurring.data,
+                freq = form.freq.data,
+                interval = form.interval.data,
+                count = form.count.data,
+                until = form.until.data,
+            )
+            added_transaction.set_amount(form.amount.data)
+            added_transaction.set_recurring(form.byweekday.data)
+            db.session.add(added_transaction)
+            edited_transaction.count = None
+            edited_transaction.until = form.date.data - timedelta(days=1)
             edited_transaction.set_recurring(form.byweekday.data)
+        else:
+            edited_transaction.count = form.count.data
+            edited_transaction.until = form.until.data
+            edited_transaction.title = form.title.data
+            edited_transaction.date = form.date.data
+            edited_transaction.description = form.description.data
+            edited_transaction.income = form.income.data
+            edited_transaction.is_recurring = form.is_recurring.data
+            edited_transaction.freq = form.freq.data
+            edited_transaction.interval = form.interval.data
+            edited_transaction.set_amount(form.amount.data)
+            if form.is_recurring.data:
+                edited_transaction.set_recurring(form.byweekday.data)
         db.session.commit()
         flash("Your changes have been saved.")
         return redirect(url_for(
@@ -102,7 +153,7 @@ def edit_transaction(transaction_id):
         ))
     elif request.method == 'GET':
         form.title.data = edited_transaction.title
-        form.date.data = edited_transaction.date
+        form.date.data = current_date
         form.description.data= edited_transaction.description
         form.income.data = edited_transaction.income
         form.is_recurring.data = edited_transaction.is_recurring
@@ -118,14 +169,15 @@ def edit_transaction(transaction_id):
         title = "Edit Transaction", 
         form = form, 
         transaction_id = edited_transaction.id,
+        date = current_date,
     )
 
 
-#@bp.route("/delete", methods=["GET"])
-@bp.route("/delete/<int:transaction_id>", methods=["GET"])
+@bp.route("/delete/<int:transaction_id>/<int:date_format>", methods=["GET"])
 @login_required
-def delete_transaction(transaction_id):
+def delete_transaction(transaction_id, date_format):
     delete_transaction = Transaction.query.filter_by(id=transaction_id).one()
+    current_date = datetime.strptime(str(date_format),'%Y%m%d').date()
     year = delete_transaction.date.year
     month = delete_transaction.date.month
     db.session.delete(delete_transaction)

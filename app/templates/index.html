@@ -86,6 +86,7 @@
                         {% if transaction.date.month == day.month and transaction.date.day == day.day and transaction.date.year == day.year %}
                         <!-- amounts are stored as integers, so /100 to get into money format -->
                         {% set transaction_amount = transaction.amount/100 %}
+                        {% set date_format = transaction.date.strftime('%Y%m%d') %}
                             <div
                                 {% if transaction.income != True %}
                                     class="row no-gutters transaction transaction-red"
@@ -93,12 +94,12 @@
                                     class="row no-gutters transaction transaction-green"
                                 {% endif %}>
                                 <div class="col">
-                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id) }}">
+                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id, date_format = date_format) }}">
                                     {{ transaction.title }}
                                 </a>
                                 </div>
                                 <div class="col">
-                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id) }}">
+                                <a href="{{ url_for('main.edit_transaction', transaction_id = transaction.id, date_format = date_format) }}">
                                     {{ "$%.2f"|format(transaction_amount) }}
                                 </a>
                                 </div>

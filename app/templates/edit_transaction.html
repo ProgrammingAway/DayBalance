@@ -5,7 +5,8 @@
 {% endblock %}
 
 {% block main %}
-    <form action="/edit/{{ transaction_id }}" method="POST">
+{% set date_format = date.strftime('%Y%m%d') %}
+    <form action="/edit/{{ transaction_id }}/{{ date_format }}" method="POST">
         <div class="form-group row justify-content-center">
             {{ form.title.label(class="col-sm-2 col-form-label") }}
             {{ form.title(class="col-sm-2") }}
@@ -50,16 +51,24 @@
             {{ form.until.label(class="col-sm-2 col-form-label") }}
             {{ form.until(class="col-sm-2") }}
         </div>
+        <div class="form-group row justify-content-center">
+            {% for subfield in form.change %}
+                <tr>
+                    <td>{{ subfield }}</td>
+                    <td>{{ subfield.label }}</td>
+                </tr>
+            {% endfor %}
+        </div>
       
         <div class="form-group row justify-content-center">
             {{ form.submit(class="col-1") }}
             <div class="col-1">
-                <!-- <button class="btn btn-cancel" onClick="window.location.href='/';">Cancel</button> -->
-                <a href="{{ url_for('main.index') }}">Cancel</a>
+                <!-- <button class="btn btn-cancel" onClick="window.location.href='/{{ date.year }}/{{ date.month }}';">Cancel</button> -->
+                <a href="{{ url_for('main.index', year = date.year, month = date.month) }}">Cancel</a>
             </div>
             <div class="col-1">
-                <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}';">Delete</button> -->
-                <a href="{{ url_for('main.delete_transaction',transaction_id = transaction_id) }}">Delete</a>
+                <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}/{{ date_format }}';">Delete</button> -->
+                <a href="{{ url_for('main.delete_transaction',transaction_id = transaction_id, date_format = date_format) }}">Delete</a>
             </div>
         </div>
 

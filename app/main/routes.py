@@ -112,7 +112,6 @@ def edit_transaction(transaction_id, date_format):
             )
             db.session.add(removed_transaction)
         elif form.is_recurring.data and form.change.data == 'after':
-            # create new recurring transaction and add until to this one
             added_transaction = Transaction(
                 user_id = current_user.id,
                 title = form.title.data, 
@@ -130,7 +129,7 @@ def edit_transaction(transaction_id, date_format):
             db.session.add(added_transaction)
             edited_transaction.count = None
             edited_transaction.until = current_date - timedelta(days=1)
-            edited_transaction.set_recurring(form.byweekday.data)
+            edited_transaction.set_recurring(edited_transaction.return_byweekday())
         else:
             edited_transaction.count = form.count.data
             edited_transaction.until = form.until.data

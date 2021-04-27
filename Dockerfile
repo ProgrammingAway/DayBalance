@@ -1,12 +1,14 @@
-FROM python:3.6-alpine
+FROM python:3.9-slim-buster
 
-RUN adduser -D daybalance
+#sudo apt install gcc python3-dev python3-pip libxml2-dev libxslt1-dev zlib1g-dev g++
+RUN useradd -m -r daybalance
 
 WORKDIR /home/daybalance
 
 COPY requirements.txt requirements.txt
 RUN python -m venv venv
 RUN venv/bin/pip install --upgrade pip
+#RUN venv/bin/pip install --upgrade pip setuptools wheel
 RUN venv/bin/pip install -r requirements.txt
 RUN venv/bin/pip install gunicorn
 

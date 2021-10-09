@@ -1,81 +1,82 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Add Transaction
+Add Transaction
 {% endblock %}
 
 {% block main %}
 {% set date_format = date.strftime('%Y%m%d') %}
-    <form action="/edit/{{ transaction_id }}/{{ date_format }}" method="POST">
-        <div class="form-group row justify-content-center">
-            {{ form.title.label(class="col-sm-2 col-form-label") }}
-            {{ form.title(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.amount.label(class="col-sm-2 col-form-label") }}
-            {{ form.amount(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.date.label(class="col-sm-2 col-form-label") }}
-            {{ form.date(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.description.label(class="col-sm-2 col-form-label") }}
-            {{ form.description(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.income.label(class="col-sm-2 col-form-label") }}
-            {{ form.income(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.is_recurring.label(class="col-sm-2 col-form-label") }}
-            {{ form.is_recurring(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.freq.label(class="col-sm-2 col-form-label") }}
-            {{ form.freq(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.interval.label(class="col-sm-2 col-form-label") }}
-            {{ form.interval(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.count.label(class="col-sm-2 col-form-label") }}
-            {{ form.count(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.byweekday.label(class="col-sm-2 col-form-label") }}
-            {{ form.byweekday(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {{ form.until.label(class="col-sm-2 col-form-label") }}
-            {{ form.until(class="col-sm-2") }}
-        </div>
-        <div class="form-group row justify-content-center">
-            {% for subfield in form.change %}
-                <tr>
-                    <td>{{ subfield }}</td>
-                    <td>{{ subfield.label }}</td>
-                </tr>
-            {% endfor %}
-        </div>
-      
-        <div class="form-group row justify-content-center">
-            {{ form.submit(class="col-1") }}
-            <div class="col-1">
-                <!-- <button class="btn btn-cancel" onClick="window.location.href='/{{ date.year }}/{{ date.month }}';">Cancel</button> -->
-                <a href="{{ url_for('main.index', year = date.year, month = date.month) }}">Cancel</a>
-            </div>
-            <div class="col-1">
-                <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}/{{ date_format }}';">Delete</button> -->
-                <a href="{{ url_for('main.delete_transaction',transaction_id = transaction_id, date_format = date_format) }}">Delete</a>
-            </div>
-        </div>
-
-        {% for field, errors in form.errors.items() %}
-            <div class="alert alert-primary border text-center" role="alert">
-                {{ form[field].label }}: {{ ', '.join(errors) }}
-            </div>
+<form action="/edit/{{ transaction_id }}/{{ date_format }}" method="POST">
+    <div class="form-group row justify-content-center">
+        {{ form.title.label(class="col-sm-2 col-form-label") }}
+        {{ form.title(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.amount.label(class="col-sm-2 col-form-label") }}
+        {{ form.amount(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.date.label(class="col-sm-2 col-form-label") }}
+        {{ form.date(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.description.label(class="col-sm-2 col-form-label") }}
+        {{ form.description(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.income.label(class="col-sm-2 col-form-label") }}
+        {{ form.income(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.is_recurring.label(class="col-sm-2 col-form-label") }}
+        {{ form.is_recurring(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.freq.label(class="col-sm-2 col-form-label") }}
+        {{ form.freq(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.interval.label(class="col-sm-2 col-form-label") }}
+        {{ form.interval(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.count.label(class="col-sm-2 col-form-label") }}
+        {{ form.count(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.byweekday.label(class="col-sm-2 col-form-label") }}
+        {{ form.byweekday(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {{ form.until.label(class="col-sm-2 col-form-label") }}
+        {{ form.until(class="col-sm-2") }}
+    </div>
+    <div class="form-group row justify-content-center">
+        {% for subfield in form.change %}
+        <tr>
+            <td>{{ subfield }}</td>
+            <td>{{ subfield.label }}</td>
+        </tr>
         {% endfor %}
-    </form>
+    </div>
+
+    <div class="form-group row justify-content-center">
+        {{ form.submit(class="col-1") }}
+        <div class="col-1">
+            <!-- <button class="btn btn-cancel" onClick="window.location.href='/{{ date.year }}/{{ date.month }}';">Cancel</button> -->
+            <a href="{{ url_for('main.index', year = date.year, month = date.month) }}">Cancel</a>
+        </div>
+        <div class="col-1">
+            <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}/{{ date_format }}';">Delete</button> -->
+            <a
+                href="{{ url_for('main.delete_transaction',transaction_id = transaction_id, date_format = date_format) }}">Delete</a>
+        </div>
+    </div>
+
+    {% for field, errors in form.errors.items() %}
+    <div class="alert alert-primary border text-center" role="alert">
+        {{ form[field].label }}: {{ ', '.join(errors) }}
+    </div>
+    {% endfor %}
+</form>
 {% endblock %}

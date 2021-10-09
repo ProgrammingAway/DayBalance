@@ -7,6 +7,7 @@ from wtforms.fields.html5 import DateField
 from app.models import User
 from flask_login import current_user
 
+
 class TransactionForm(Form):
     title = StringField('Transaction Name', validators=[InputRequired()])
     date = DateField('Transaction Date', validators=[InputRequired()])
@@ -66,6 +67,8 @@ class TransactionForm(Form):
     )
 
     submit = SubmitField('Submit')
+    cancel = SubmitField('Cancel')
+    delete = SubmitField('Delete')
 
     def validate_date(self, date):
         start_date = current_user.start_date
@@ -78,6 +81,8 @@ class TransactionForm(Form):
     def validate_until(self, until):
         if until.data is not None:
             if self.count.data is not None:
-                raise ValidationError("Select 'End Date' or 'Number of Transactions', but not both.")
+                raise ValidationError(
+                    "Select 'End Date' or 'Number of Transactions', but not both.")
             if until.data < self.date.data:
-                raise ValidationError('Please use an end date after the transaction date.')
+                raise ValidationError(
+                    'Please use an end date after the transaction date.')

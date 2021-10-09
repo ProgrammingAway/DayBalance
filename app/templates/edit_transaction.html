@@ -62,15 +62,8 @@ Add Transaction
 
     <div class="form-group row justify-content-center">
         {{ form.submit(class="col-1") }}
-        <div class="col-1">
-            <!-- <button class="btn btn-cancel" onClick="window.location.href='/{{ date.year }}/{{ date.month }}';">Cancel</button> -->
-            <a href="{{ url_for('main.index', year = date.year, month = date.month) }}">Cancel</a>
-        </div>
-        <div class="col-1">
-            <!-- <button class="btn btn-delete" onClick="window.location.href='/delete/{{ transaction_id }}/{{ date_format }}';">Delete</button> -->
-            <a
-                href="{{ url_for('main.delete_transaction',transaction_id = transaction_id, date_format = date_format) }}">Delete</a>
-        </div>
+        {{ form.cancel(class="col-1") }}
+        {{ form.delete(class="col-1") }}
     </div>
 
     {% for field, errors in form.errors.items() %}

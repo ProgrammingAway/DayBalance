@@ -82,70 +82,16 @@ def edit_transaction(transaction_id, date_format):
     edited_transaction = Transaction.query.filter_by(id=transaction_id).one()
     current_date = datetime.strptime(str(date_format), '%Y%m%d').date()
     if request.method == 'POST' and form.validate():
-        if form.is_recurring.data and form.change.data == 'current':
-            if form.amount.data != edited_transaction.amount:
-                added_transaction = Transaction(
-                    title=form.title.data,
-                    description=form.description.data,
-                    income=form.income.data,
-                    is_recurring=False,
-                    freq=form.freq.data,
-                    interval=form.interval.data,
-                    count=form.count.data,
-                    until=form.until.data,
-                )
-                added_transaction.set_amount(form.amount.data)
-                added_transaction.set_recurring(form.byweekday.data)
-            else:
-                added_transaction = TransactionException(
-                    delete=False,
-                    transaction_id=edited_transaction.id,
-                )
-            added_transaction.date = form.date.data
-            added_transaction.user_id = current_user.id
-            db.session.add(added_transaction)
-            removed_transaction = TransactionException(
-                date=current_date,
-                delete=True,
-                transaction_id=edited_transaction.id,
-                user_id=current_user.id,
-            )
-            db.session.add(removed_transaction)
-        elif form.is_recurring.data and form.change.data == 'after':
-            added_transaction = Transaction(
-                user_id=current_user.id,
-                title=form.title.data,
-                date=form.date.data,
-                description=form.description.data,
-                income=form.income.data,
-                is_recurring=form.is_recurring.data,
-                freq=form.freq.data,
-                interval=form.interval.data,
-                count=form.count.data,
-                until=form.until.data,
-            )
-            added_transaction.set_amount(form.amount.data)
-            added_transaction.set_recurring(form.byweekday.data)
-            db.session.add(added_transaction)
-            edited_transaction.count = None
-            edited_transaction.until = current_date - timedelta(days=1)
-            edited_transaction.set_recurring(
-                edited_transaction.return_byweekday())
+        print(request.form.keys())
+        if 'cancel' in request.form.keys():
+            flash("Edit cancelled.")
+        elif 'delete' in request.form.keys():
+            delete_the_transaction(form, edited_transaction, current_date)
+            db.session.commit()
+            flash("Transaction deleted.")
         else:
-            edited_transaction.count = form.count.data
-            edited_transaction.until = form.until.data
-            edited_transaction.title = form.title.data
-            edited_transaction.date = form.date.data
-            edited_transaction.description = form.description.data
-            edited_transaction.income = form.income.data
-            edited_transaction.is_recurring = form.is_recurring.data
-            edited_transaction.freq = form.freq.data
-            edited_transaction.interval = form.interval.data
-            edited_transaction.set_amount(form.amount.data)
-            if form.is_recurring.data:
-                edited_transaction.set_recurring(form.byweekday.data)
-        db.session.commit()
-        flash("Your changes have been saved.")
+            edit_the_transaction(form, edited_transaction, current_date)
+            flash("Transaction saved.")
         return redirect(url_for(
             "main.index",
             year=form.date.data.year,
@@ -173,14 +119,75 @@ def edit_transaction(transaction_id, date_format):
     )
 
 
-@bp.route("/delete/<int:transaction_id>/<int:date_format>", methods=["GET"])
-@login_required
-def delete_transaction(transaction_id, date_format):
-    change = 'current'
-    delete_transaction = Transaction.query.filter_by(id=transaction_id).one()
-    delete_date = datetime.strptime(str(date_format), '%Y%m%d').date()
+def edit_the_transaction(form, edited_transaction, current_date):
+    if form.is_recurring.data and form.change.data == 'current':
+        if form.amount.data != edited_transaction.amount:
+            added_transaction = Transaction(
+                title=form.title.data,
+                description=form.description.data,
+                income=form.income.data,
+                is_recurring=False,
+                freq=form.freq.data,
+                interval=form.interval.data,
+                count=form.count.data,
+                until=form.until.data,
+            )
+            added_transaction.set_amount(form.amount.data)
+            added_transaction.set_recurring(form.byweekday.data)
+        else:
+            added_transaction = TransactionException(
+                delete=False,
+                transaction_id=edited_transaction.id,
+            )
+        added_transaction.date = form.date.data
+        added_transaction.user_id = current_user.id
+        db.session.add(added_transaction)
+        removed_transaction = TransactionException(
+            date=current_date,
+            delete=True,
+            transaction_id=edited_transaction.id,
+            user_id=current_user.id,
+        )
+        db.session.add(removed_transaction)
+    elif form.is_recurring.data and form.change.data == 'after':
+        added_transaction = Transaction(
+            user_id=current_user.id,
+            title=form.title.data,
+            date=form.date.data,
+            description=form.description.data,
+            income=form.income.data,
+            is_recurring=form.is_recurring.data,
+            freq=form.freq.data,
+            interval=form.interval.data,
+            count=form.count.data,
+            until=form.until.data,
+            transaction_exceptions=edited_transaction.transaction_exceptions,
+        )
+        added_transaction.set_amount(form.amount.data)
+        added_transaction.set_recurring(form.byweekday.data)
+        db.session.add(added_transaction)
+        edited_transaction.count = None
+        edited_transaction.until = current_date - timedelta(days=1)
+        edited_transaction.set_recurring(
+            edited_transaction.return_byweekday())
+    else:
+        edited_transaction.count = form.count.data
+        edited_transaction.until = form.until.data
+        edited_transaction.title = form.title.data
+        edited_transaction.date = form.date.data
+        edited_transaction.description = form.description.data
+        edited_transaction.income = form.income.data
+        edited_transaction.is_recurring = form.is_recurring.data
+        edited_transaction.freq = form.freq.data
+        edited_transaction.interval = form.interval.data
+        edited_transaction.set_amount(form.amount.data)
+        if form.is_recurring.data:
+            edited_transaction.set_recurring(form.byweekday.data)
+    db.session.commit()
 
-    if delete_transaction.is_recurring and change == 'current':
+
+def delete_the_transaction(form, delete_transaction, delete_date):
+    if delete_transaction.is_recurring and form.change.data == 'current':
         removed_transaction = TransactionException(
             date=delete_date,
             delete=True,
@@ -188,18 +195,10 @@ def delete_transaction(transaction_id, date_format):
             user_id=current_user.id,
         )
         db.session.add(removed_transaction)
-    elif delete_transaction.is_recurring and change == 'after':
+    elif delete_transaction.is_recurring and form.change.data == 'after':
         delete_transaction.count = None
         delete_transaction.until = delete_date - timedelta(days=1)
         delete_transaction.set_recurring(delete_transaction.return_byweekday())
     else:
         db.session.delete(delete_transaction)
     db.session.commit()
-
-    # Redirect user to home page
-    flash("Transaction Deleted")
-    return redirect(url_for(
-        "main.index",
-        year=delete_date.year,
-        month=delete_date.month,
-    ))

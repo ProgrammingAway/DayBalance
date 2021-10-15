@@ -67,7 +67,7 @@ class TransactionForm(Form):
     )
 
     submit = SubmitField('Submit')
-    cancel = SubmitField('Cancel')
+    cancel = SubmitField('Cancel', render_kw={'formnovalidate': True})
     delete = SubmitField('Delete')
 
     def validate_date(self, date):
